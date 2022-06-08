@@ -1,0 +1,63 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"editor.suggest.snippetsPreventQuickSuggestions": false,
+		"editor.acceptSuggestionOnEnter": "off",
+		"python.formatting.provider": "black",
+		"python.formatting.blackArgs": [
+			"--line-length=80"
+		],
+		"autoDocstring.docstringFormat": "google",
+		"[python]": {
+			"editor.formatOnType": true,
+			"editor.formatOnSave": true,
+			"editor.rulers": [
+				80,
+			]
+		},
+		"workbench.colorCustomizations": {
+			"editorRuler.foreground": "#238390"
+		},
+		"terminal.integrated.env.windows": {
+			"PYTHONPATH": "${workspaceFolder}"
+		},
+		"terminal.integrated.env.osx": {
+			"PYTHONPATH": "${workspaceFolder}"
+		},
+		"terminal.integrated.env.linux": {
+			"PYTHONPATH": "${workspaceFolder}"
+		}
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "Python: 本项目",
+				"type": "python",
+				"request": "launch",
+				"program": "${workspaceFolder}/pyGobang.py",
+				"console": "integratedTerminal",
+				"justMyCode": true
+			},
+			{
+				"name": "Python: 当前文件",
+				"type": "python",
+				"request": "launch",
+				"program": "${file}",
+				"console": "integratedTerminal",
+				"justMyCode": true
+			}
+		]
+	},
+	"extensions": {
+		"recommendations": [
+			"ms-python.python",
+			"njpwerner.autodocstring",
+			"KevinRose.vsc-python-indent"
+		]
+	}
+}

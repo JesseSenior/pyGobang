@@ -1,0 +1,2 @@
+conda activate pyGobang_env
+pyinstaller pyGobang.spec
