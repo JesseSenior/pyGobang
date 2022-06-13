@@ -18,6 +18,8 @@
 
 游戏字体为开源字体[Sarasa-Mono-SC-Nerd](https://github.com/laishulu/Sarasa-Mono-SC-Nerd)。
 
+*衷心感谢我的朋友@Charholer和@Vokain提供的音乐以及音效支持。*
+
 ## 如何游玩
 
 下载（即将发布的）release版本，或者clone本项目至本地后运行，具体参看下文[配置环境](#1-配置环境)部分。

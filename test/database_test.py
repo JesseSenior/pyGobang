@@ -19,7 +19,8 @@ Description: Unit test of database.py
 """
 from random import randrange
 from time import sleep
-from src.constants import DEFAULT_BOARD_SIZE
+
+import src.constants
 from src.core import Board
 from src.database import BoardDatabase
 from src.players import MonkeyPlayer
@@ -27,7 +28,7 @@ from test.core_test import plot_board, info_of_board
 
 
 def make_board(
-    board_size=DEFAULT_BOARD_SIZE,
+    board_size=src.constants.DEFAULT_BOARD_SIZE,
     player_a="",
     player_b="",
     amount_of_attempt=50,

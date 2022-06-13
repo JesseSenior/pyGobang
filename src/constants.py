@@ -39,6 +39,8 @@ TEXTURE_BLOCK_SIZE = 160
 SELECT_ATTEMPT = 1000
 OVERLAY_SCALE = 4
 
+AI_ABILITY = 1000
+
 pygame.freetype.init()
 TEXT_FONT = pygame.freetype.Font(
     "res/font/sarasa-mono-sc-nerd/sarasa-mono-sc-nerd-regular.ttf",

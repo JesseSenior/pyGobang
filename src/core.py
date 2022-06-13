@@ -23,7 +23,8 @@ from typing import List, Set, Tuple
 import numpy as np
 import time
 
-from src.constants import DEFAULT_BOARD_SIZE, TIME_FORMAT
+import src.constants
+from src.constants import TIME_FORMAT
 
 
 class Board:
@@ -50,7 +51,7 @@ class Board:
 
     def __init__(
         self,
-        board_size: Tuple[int, int] = DEFAULT_BOARD_SIZE,
+        board_size: Tuple[int, int] = None,
         competitor_black: str = "",
         competitor_white: str = "",
     ) -> None:
@@ -64,6 +65,8 @@ class Board:
             competitor_white (str, optional): 
                 The name of thw white competitor. Defaults to "".
         """
+        if board_size == None:
+            board_size = src.constants.DEFAULT_BOARD_SIZE
         assert board_size[0] > 0 and board_size[1] > 0
 
         self.timestamp = time.strftime(TIME_FORMAT, time.localtime(time.time()))

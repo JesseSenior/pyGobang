@@ -18,7 +18,9 @@ File: src/display/widget/board.py
 Description: The widget for displaying the board.
 """
 from __future__ import annotations
+from random import choice
 import threading
+from time import sleep
 import pygame
 import numpy as np
 from pygame.constants import MOUSEBUTTONDOWN, BUTTON_LEFT
@@ -48,6 +50,17 @@ class UIPlayer(Player):
     def __init__(self, board_ui: BoardUI) -> None:
         super().__init__(board_ui._board)
         self._board_ui = board_ui
+
+
+class MonkeyUIPlayer(UIPlayer):
+    def __init__(self, board_ui: BoardUI) -> None:
+        super().__init__(board_ui)
+        self._thread = threading.Thread(target=self.place_a_piece)
+        self._thread.start()
+
+    def place_a_piece(self) -> None:
+        sleep(0.5)
+        self._board_ui.place_a_piece(choice(list(self.board.available_place)))
 
 
 class HumanUIPlayer(UIPlayer):
@@ -97,9 +110,9 @@ class RobotUIPlayer(UIPlayer, RobotPlayer):
     def place_a_piece(self) -> None:
         assert len(self.board.available_place) > 0
         if len(self.board.kifu) > 0:
-            self.mcts.update_with_move(self.board.kifu[-1])
+            self.mcts.update_with_move(self.board.kifu[-1], False)
         move = self.mcts.get_move(self.board)
-        self.mcts.update_with_move(move)
+        self.mcts.update_with_move(move, False)
         self._board_ui.place_a_piece(move)
 
 
@@ -123,6 +136,12 @@ class BoardUI(Widget):
             self, self._surface_raw.get_rect(), self._surface_raw
         )
         self.load_board(board)
+        self.set_player_list(player_list)
+
+        self._last_sub_widgets = []
+        self.editable = True
+
+    def set_player_list(self, player_list: List[UIPlayer]):
         self._player_list = player_list
         self._current_player = (
             self._board.current_side
@@ -131,16 +150,13 @@ class BoardUI(Widget):
         )
         self._player = self._player_list[self._current_player](self)
 
-        self._last_sub_widgets = []
-        self.editable = True
-
     def load_board(self, board: Board):
         for widget in reversed(self._sub_widgets):
             try:
                 widget.visible = False
             except:
                 pass
-        self._last_sub_widgets = self._sub_widgets
+        self._last_sub_widgets = self._sub_widgets[1:]
         self._sub_widgets = []
 
         if board == None:

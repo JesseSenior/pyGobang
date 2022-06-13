@@ -18,6 +18,8 @@ The game currently uses Monte Carlo Search Trees (MCTS) to implement the human-c
 
 The game font is the open source font [Sarasa-Mono-SC-Nerd](https://github.com/laishulu/Sarasa-Mono-SC-Nerd).
 
+*A big thank you to my friends @Charholer and @Vokain for the music as well as the sound support.*
+
 ## How to Play
 
 Download the (soon to be released) release version, or clone the project locally and run it, as described in the [Configuring the Environment section](#1-configuring-the-environment) below.

@@ -22,15 +22,21 @@ from pygame.constants import QUIT
 from collections import defaultdict
 
 import src.constants
-from src.constants import DATABASE, SCREEN_CHANGE, WINDOW_SIZE
+from src.constants import (
+    DATABASE,
+    SCREEN_CHANGE,
+    WINDOW_SIZE,
+)
 from src.core import Board
 from src.display.effect import mosaic_effect, surface_mosaic
 from src.display.screen import Screen
 from src.display.widget import Widget
-from src.display.widget.board import BoardUI
+from src.display.widget.board import BoardUI, MonkeyUIPlayer
 from src.display.widget.button import Button
+from src.display.widget.input_box import InputBox
 from src.display.widget.logo import LOGO
 from src.display.widget.table import Table
+from src.display.widget.text import Text
 
 
 class MainScreen(Screen):
@@ -60,6 +66,7 @@ class MainScreen(Screen):
                 min(WINDOW_SIZE) * 2.75 // 5,
                 min(WINDOW_SIZE) * 2.75 // 5,
             ),
+            player_list=[MonkeyUIPlayer, MonkeyUIPlayer],
         )
         self._board.visible = True
         self._sub_widgets.append(self._board)
@@ -87,8 +94,10 @@ class MainScreen(Screen):
                 widget.visible = False
             for widget in self._main_list:
                 widget.visible = True
+            if self._current_list == self._history_list:
+                self._board.editable = True
+                self._board.set_player_list(self._board._player_list)
             self._current_list = self._main_list
-            self._board.load_board(Board())
 
         self._history_list = []
 
@@ -136,6 +145,15 @@ class MainScreen(Screen):
         self._sub_widgets.append(self._statistic_button)
         self._main_list.append(self._statistic_button)
 
+        self._setting_list = []
+
+        def setting_button():
+            for widget in self._main_list:
+                widget.visible = False
+            for widget in self._setting_list:
+                widget.visible = True
+            self._current_list = self._setting_list
+
         self._setting_button = Button(
             self,
             pygame.Rect(
@@ -145,7 +163,7 @@ class MainScreen(Screen):
                 WINDOW_SIZE[1] // 13,
             ),
             text="设置",
-            on_press=lambda: print("在做了在做了( =• ω• = )"),
+            on_press=setting_button,
         )
         self._sub_widgets.append(self._setting_button)
         self._main_list.append(self._setting_button)
@@ -164,10 +182,6 @@ class MainScreen(Screen):
         self._sub_widgets.append(self._about_button)
         self._main_list.append(self._about_button)
 
-        def exit():
-            print("愿你有一天能和你最重要的人重逢。")
-            pygame.event.post(pygame.event.Event(QUIT))
-
         self._exit_button = Button(
             self,
             pygame.Rect(
@@ -177,7 +191,7 @@ class MainScreen(Screen):
                 WINDOW_SIZE[1] // 13,
             ),
             text="退出",
-            on_press=exit,
+            on_press=lambda: pygame.event.post(pygame.event.Event(QUIT)),
         )
         self._sub_widgets.append(self._exit_button)
         self._main_list.append(self._exit_button)
@@ -196,6 +210,7 @@ class MainScreen(Screen):
         self._sub_widgets.append(self._return_button)
         self._history_list.append(self._return_button)
         self._statistic_list.append(self._return_button)
+        self._setting_list.append(self._return_button)
 
         self._history_table = MainScreen.history_table(
             self,
@@ -268,6 +283,84 @@ class MainScreen(Screen):
         self._sub_widgets.append(self._statistic_table)
         self._statistic_list.append(self._statistic_table)
 
+        self._setting_board_size_text = Text(
+            self,
+            pygame.Rect(
+                WINDOW_SIZE[0] * 3 // 5,
+                WINDOW_SIZE[1] * 3 // 13,
+                WINDOW_SIZE[0] * 1.5 // 5,
+                WINDOW_SIZE[1] * 1 // 13,
+            ),
+            text="棋盘尺寸:",
+        )
+        self._sub_widgets.append(self._setting_board_size_text)
+        self._setting_list.append(self._setting_board_size_text)
+
+        self._setting_board_size_inputbox = MainScreen.setting_board_size_inputbox(
+            self,
+            pygame.Rect(
+                WINDOW_SIZE[0] * 3 // 5,
+                WINDOW_SIZE[1] * 4 // 13,
+                WINDOW_SIZE[0] * 1.5 // 5,
+                WINDOW_SIZE[1] * 1 // 13,
+            ),
+            text_hint=str(src.constants.DEFAULT_BOARD_SIZE),
+        )
+        self._sub_widgets.append(self._setting_board_size_inputbox)
+        self._setting_list.append(self._setting_board_size_inputbox)
+
+        self._setting_gentexture_speed_text = Text(
+            self,
+            pygame.Rect(
+                WINDOW_SIZE[0] * 3 // 5,
+                WINDOW_SIZE[1] * 5 // 13,
+                WINDOW_SIZE[0] * 1.5 // 5,
+                WINDOW_SIZE[1] * 1 // 13,
+            ),
+            text="纹理质量:",
+        )
+        self._sub_widgets.append(self._setting_gentexture_speed_text)
+        self._setting_list.append(self._setting_gentexture_speed_text)
+
+        self._setting_gentexture_speed_inputbox = MainScreen.setting_gentexture_speed_inputbox(
+            self,
+            pygame.Rect(
+                WINDOW_SIZE[0] * 3 // 5,
+                WINDOW_SIZE[1] * 6 // 13,
+                WINDOW_SIZE[0] * 1.5 // 5,
+                WINDOW_SIZE[1] * 1 // 13,
+            ),
+            text_hint=str(src.constants.SELECT_ATTEMPT),
+        )
+        self._sub_widgets.append(self._setting_gentexture_speed_inputbox)
+        self._setting_list.append(self._setting_gentexture_speed_inputbox)
+
+        self._setting_ai_ability_text = Text(
+            self,
+            pygame.Rect(
+                WINDOW_SIZE[0] * 3 // 5,
+                WINDOW_SIZE[1] * 7 // 13,
+                WINDOW_SIZE[0] * 1.5 // 5,
+                WINDOW_SIZE[1] * 1 // 13,
+            ),
+            text="AI智商:",
+        )
+        self._sub_widgets.append(self._setting_ai_ability_text)
+        self._setting_list.append(self._setting_ai_ability_text)
+
+        self._setting_ai_ability_inputbox = MainScreen.setting_ai_ability_inputbox(
+            self,
+            pygame.Rect(
+                WINDOW_SIZE[0] * 3 // 5,
+                WINDOW_SIZE[1] * 8 // 13,
+                WINDOW_SIZE[0] * 1.5 // 5,
+                WINDOW_SIZE[1] * 1 // 13,
+            ),
+            text_hint=str(src.constants.AI_ABILITY),
+        )
+        self._sub_widgets.append(self._setting_ai_ability_inputbox)
+        self._setting_list.append(self._setting_ai_ability_inputbox)
+
         self.visible = True
 
     class history_table(Table):
@@ -278,27 +371,16 @@ class MainScreen(Screen):
             surface: pygame.Surface = None,
             present_number: int = 4,
         ) -> None:
-            self._boards = DATABASE.export()
-            self._text_list = [
-                x.timestamp
-                + "-"
-                + x.competitor_black
-                + "-"
-                + x.competitor_white
-                for x in self._boards
-            ]
+            self._text_list = []
             super().__init__(
                 parent, rect, surface, self._text_list, present_number
             )
+            self.refresh()
 
         def refresh(self):
             self._boards = DATABASE.export()
             text_list = [
-                x.timestamp
-                + " || "
-                + x.competitor_black
-                + " vs "
-                + x.competitor_white
+                [x.timestamp, x.competitor_black + " vs " + x.competitor_white]
                 for x in self._boards
             ]
             if self._text_list != text_list:
@@ -307,11 +389,11 @@ class MainScreen(Screen):
 
         def shift_in(self, duration: float):
             self._parent._board.load_board(Board())
+            self._parent._board.editable = False
             self.refresh()
             return super().shift_in(duration)
 
         def draw_begin(self) -> None:
-            self._parent._board.editable = not self.visible
             if self.visible and len(self._boards) > 0:
                 if (
                     self._parent._board._board
@@ -350,7 +432,7 @@ class MainScreen(Screen):
             count = sorted(count.items(), key=lambda x: x[1], reverse=True)
             text_list = []
             for key, val in count:
-                text_list.append("Player: " + key + " || Score: " + str(val))
+                text_list.append(["Player: " + key, "Score: " + str(val)])
             return text_list
 
         def shift_in(self, duration: float):
@@ -359,6 +441,48 @@ class MainScreen(Screen):
                 self.set_text_list(textlist)
                 self._text_list = textlist
             return super().shift_in(duration)
+
+    class setting_board_size_inputbox(InputBox):
+        def activate_out(self, duration: float):
+            super().activate_out(duration)
+            try:
+                tmp = eval(self.text)
+                if (
+                    type(tmp) == tuple
+                    and len(tmp) == 2
+                    and type(tmp[0]) == int
+                    and type(tmp[1]) == int
+                ):
+                    src.constants.DEFAULT_BOARD_SIZE = tmp
+                    self._parent._board.load_board(Board())
+                    self.text_hint = str(tmp)
+            except:
+                pass
+            self.text = ""
+
+    class setting_gentexture_speed_inputbox(InputBox):
+        def activate_out(self, duration: float):
+            super().activate_out(duration)
+            try:
+                tmp = eval(self.text)
+                if type(tmp) == int and tmp > 0:
+                    src.constants.SELECT_ATTEMPT = tmp
+                    self.text_hint = str(tmp)
+            except:
+                pass
+            self.text = ""
+
+    class setting_ai_ability_inputbox(InputBox):
+        def activate_out(self, duration: float):
+            super().activate_out(duration)
+            try:
+                tmp = eval(self.text)
+                if type(tmp) == int and tmp > 0:
+                    src.constants.AI_ABILITY = tmp
+                    self.text_hint = str(tmp)
+            except:
+                pass
+            self.text = ""
 
     @Widget.visible.setter
     def visible(self, value: bool):
@@ -412,6 +536,11 @@ class MainScreen(Screen):
 
     def draw_begin(self) -> None:
         src.constants.GAME_BACKGROUND.draw()
+        if self._current_list != self._history_list and (
+            self._board._board.winner != None
+            or len(self._board._board.available_place) == 0
+        ):
+            self._board.load_board(Board())
 
     def draw_end(self) -> None:
         if not self.visible:

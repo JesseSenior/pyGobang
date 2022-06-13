@@ -28,7 +28,6 @@ from src.constants import (
     COLOR_TRANSPARENT,
     COLOR_WHITE,
     DATABASE,
-    DEFAULT_BOARD_SIZE,
     SCREEN_CHANGE,
     TIME_FORMAT,
     WINDOW_SIZE,
@@ -181,7 +180,7 @@ class GameScreen(Screen):
 
         def set_player_name():
             self._board = Board(
-                (9, 9) if self._game_mode else DEFAULT_BOARD_SIZE,
+                (9, 9) if self._game_mode else src.constants.DEFAULT_BOARD_SIZE,
                 competitor_black=self._player_A_name_input_box.text,
                 competitor_white=self._player_B_name_input_box.text
                 if self._game_mode == 0

@@ -63,7 +63,8 @@ class InputBox(Widget):
 
         def _mouse_button_down(event: pygame.event.Event):
             if (
-                pygame.Rect(
+                self._visible
+                and pygame.Rect(
                     *self._surface.get_abs_offset(), *self._surface.get_size()
                 ).collidepoint(event.pos)
                 and event.button == BUTTON_LEFT

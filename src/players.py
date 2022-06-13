@@ -26,6 +26,7 @@ from random import choice
 from copy import deepcopy
 from operator import itemgetter
 
+import src.constants
 from src.core import Board
 
 
@@ -168,17 +169,19 @@ class RobotPlayer(Player):
                 key=lambda act_node: act_node[1]._n_visits,
             )[0]
 
-        def update_with_move(self, last_move):
-            if last_move in self._root._children:
+        def update_with_move(self, last_move, train=True):
+            if last_move in self._root._children and train:
                 self._root = self._root._children[last_move]
                 self._root._parent = None
             else:
                 self._root = RobotPlayer.node(None, 1.0)
 
-    def __init__(self, playing_board: Board, n_playout=10000) -> None:
+    def __init__(self, playing_board: Board, n_playout=None) -> None:
+        if n_playout == None:
+            n_playout = src.constants.AI_ABILITY
         super().__init__(playing_board)
         self.mcts = RobotPlayer.MCTS(
-            RobotPlayer.policy_value_fn, n_playout=n_playout
+            RobotPlayer.policy_value_fn, n_playout=src.constants.AI_ABILITY
         )
 
     def place_a_piece(self) -> None:

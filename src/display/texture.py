@@ -26,7 +26,8 @@ from typing import Tuple
 from PIL import Image
 from skimage import util
 
-from src.constants import OVERLAY_SCALE, SELECT_ATTEMPT, TEXTURE_BLOCK_SIZE
+import src.constants
+from src.constants import OVERLAY_SCALE, TEXTURE_BLOCK_SIZE
 from src.display.tool import image_to_surface
 
 
@@ -61,7 +62,7 @@ def random_best_patch(texture, block_size, overlap, res, y, x):
     h, w, _ = texture.shape
     errors = np.full((h - block_size, w - block_size), np.inf)
 
-    for t in range(SELECT_ATTEMPT):
+    for t in range(src.constants.SELECT_ATTEMPT):
         i, j = choice(range(h - block_size)), choice(range(w - block_size))
         patch = texture[i : i + block_size, j : j + block_size]
         e = L2_overlay_diff(patch, block_size, overlap, res, y, x)

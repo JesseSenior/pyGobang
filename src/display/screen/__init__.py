@@ -37,6 +37,7 @@ class Screen(Widget):
         self._handlers[SCREEN_CHANGE].append(self._screen_chage)
 
     def _game_quit(self, event: pygame.event.Event):
+        print("✨愿你有一天能和你最重要的人重逢✨")
         self.stop_loop = 0
 
     def _screen_chage(self, event: pygame.event.Event):
