@@ -489,10 +489,12 @@ class PieceStatus(Widget):
         self._surface_raw_final.fill(COLOR_TRANSPARENT)
         self._surface_raw_final.set_alpha(0)
         self._visible = False
-
+        
     def draw_begin(self) -> None:
         status = (
-            self._status if self._board.winner == None else self._board.winner
+            self._board.current_side
+            if self._board.winner == None
+            else self._board.winner
         )
         if self._status != status:
             self._flags.append(

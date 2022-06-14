@@ -70,6 +70,7 @@ class Table(Widget):
                         self._active_item != y + self._display_offset
                         and len(self._sub_widgets) > y + self._display_offset
                     ):
+                        pygame.mixer.Sound("res/sound/sound1.ogg").play()
                         self._sub_widgets[self._active_item].active = False
                         self._active_item = y + self._display_offset
                         self._sub_widgets[self._active_item].active = True
@@ -137,9 +138,7 @@ class Table(Widget):
         self._visible = False
 
         self._pre_flags.append(
-            blur_effect(
-                self._surface, "ease_out", (self._blur, 0), duration
-            )
+            blur_effect(self._surface, "ease_out", (self._blur, 0), duration)
         )
         self._flags.append(
             alpha_effect(self._surface_raw, "ease_out", (255, 0), duration)

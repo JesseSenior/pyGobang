@@ -114,5 +114,5 @@ After repeating the loop enough times, a better strategy is obtained.
   - [x] History search, restore, delete.
   - [x] Statistics.
   - [x] Game settings.
-  - [ ] Game sound effects, background music.
+  - [x] Game sound effects, background music.
   - [ ] Game animation effects.

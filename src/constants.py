@@ -39,7 +39,7 @@ TEXTURE_BLOCK_SIZE = 160
 SELECT_ATTEMPT = 1000
 OVERLAY_SCALE = 4
 
-AI_ABILITY = 1000
+AI_ABILITY = 7500
 
 pygame.freetype.init()
 TEXT_FONT = pygame.freetype.Font(

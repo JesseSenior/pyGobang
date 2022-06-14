@@ -19,7 +19,7 @@ Description: General button widget.
 """
 from __future__ import annotations
 import pygame
-from pygame.constants import MOUSEBUTTONDOWN, BUTTON_LEFT
+from pygame.constants import MOUSEBUTTONDOWN, BUTTON_LEFT, MOUSEMOTION
 from typing import Callable
 
 from src.display.widget import Widget
@@ -52,9 +52,25 @@ class Button(Widget):
                     ).collidepoint(event.pos)
                     and event.button == BUTTON_LEFT
                 ):
+                    pygame.mixer.Sound("res/sound/sound2.ogg").play()
                     on_press()
 
         self._handlers[MOUSEBUTTONDOWN].append(_mouse_button_down)
+
+        self._on_mouse = False
+
+        def _mouse_motion(event: pygame.event.Event):
+            if self._visible:
+                if pygame.Rect(
+                    *self._surface.get_abs_offset(), *self._surface.get_size()
+                ).collidepoint(event.pos):
+                    if not self._on_mouse:
+                        pygame.mixer.Sound("res/sound/sound1.ogg").play()
+                        self._on_mouse = True
+                else:
+                    self._on_mouse = False
+
+        # self._handlers[MOUSEMOTION].append(_mouse_motion)
 
     @Widget.visible.setter
     def visible(self, value: bool):

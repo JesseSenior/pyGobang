@@ -147,7 +147,7 @@ class InputBox(Widget):
 
         def onexit():
             self._activate = True
-
+        pygame.mixer.Sound("res/sound/sound1.ogg").play()
         self._flags.append(
             alpha_effect(
                 self._activate_background,

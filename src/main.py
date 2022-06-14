@@ -32,6 +32,8 @@ def main():
     pygame.display.set_caption("pyGobang, a python based Gobang game")
     icon = pygame.image.load("res/image/icon.png").convert_alpha()
     pygame.display.set_icon(icon)
+    pygame.mixer.music.load("res/sound/background_music.ogg")
+    pygame.mixer.music.play(-1,fade_ms=6000)
     screen_status = 1
     while screen_status != 0:
         screen_status = screen_list[screen_status]().loop()

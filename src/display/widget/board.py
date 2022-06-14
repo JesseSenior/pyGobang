@@ -93,6 +93,7 @@ class HumanUIPlayer(UIPlayer):
             x, y = int(x), int(y)
             if 1 <= x <= self._col and 1 <= y <= self._row:
                 self._board_ui.place_a_piece((x - 1, y - 1))
+                pygame.mixer.Sound("res/sound/sound2.ogg").play()
 
     def stop_play(self) -> None:
         self._board_ui._handlers[MOUSEBUTTONDOWN].remove(
@@ -114,6 +115,7 @@ class RobotUIPlayer(UIPlayer, RobotPlayer):
         move = self.mcts.get_move(self.board)
         self.mcts.update_with_move(move, False)
         self._board_ui.place_a_piece(move)
+        pygame.mixer.Sound("res/sound/sound2.ogg").play()
 
 
 class BoardUI(Widget):

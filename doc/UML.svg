@@ -704,7 +704,7 @@
 <polygon fill="none" stroke="black" points="2336.5,-3942 2336.5,-4206 2823.5,-4206 2823.5,-3942 2336.5,-3942"/>
 <text text-anchor="middle" x="2580" y="-4190.8" font-family="Times New Roman,serif" font-size="14.00">src.display.widget.table.Table</text>
 <polyline fill="none" stroke="black" points="2336.5,-4183 2823.5,-4183 "/>
-<text text-anchor="start" x="2344.5" y="-4167.8" font-family="Times New Roman,serif" font-size="14.00">_active_item : NoneType, int</text>
+<text text-anchor="start" x="2344.5" y="-4167.8" font-family="Times New Roman,serif" font-size="14.00">_active_item : int, NoneType</text>
 <text text-anchor="start" x="2344.5" y="-4152.8" font-family="Times New Roman,serif" font-size="14.00">_blur : int</text>
 <text text-anchor="start" x="2344.5" y="-4137.8" font-family="Times New Roman,serif" font-size="14.00">_display_offset : int</text>
 <text text-anchor="start" x="2344.5" y="-4122.8" font-family="Times New Roman,serif" font-size="14.00">_item_height</text>
@@ -1087,19 +1087,20 @@
 </g>
 <!-- src.display.widget.button.Button -->
 <g id="node35" class="node"><title>src.display.widget.button.Button</title>
-<polygon fill="none" stroke="black" points="4634,-3438.5 4634,-3612.5 5056,-3612.5 5056,-3438.5 4634,-3438.5"/>
-<text text-anchor="middle" x="4845" y="-3597.3" font-family="Times New Roman,serif" font-size="14.00">src.display.widget.button.Button</text>
-<polyline fill="none" stroke="black" points="4634,-3589.5 5056,-3589.5 "/>
-<text text-anchor="start" x="4642" y="-3574.3" font-family="Times New Roman,serif" font-size="14.00">_blur : int</text>
-<text text-anchor="start" x="4642" y="-3559.3" font-family="Times New Roman,serif" font-size="14.00">_text</text>
-<text text-anchor="start" x="4642" y="-3544.3" font-family="Times New Roman,serif" font-size="14.00">_visible : bool</text>
-<text text-anchor="start" x="4642" y="-3529.3" font-family="Times New Roman,serif" font-size="14.00">visible : bool</text>
-<polyline fill="none" stroke="black" points="4634,-3521.5 5056,-3521.5 "/>
-<text text-anchor="start" x="4642" y="-3506.3" font-family="Times New Roman,serif" font-size="14.00">__init__(parent: Widget, rect, surface, text: str, on_press: Callable[[], ]): </text>
-<text text-anchor="start" x="4642" y="-3491.3" font-family="Times New Roman,serif" font-size="14.00">draw_begin(): </text>
-<text text-anchor="start" x="4642" y="-3476.3" font-family="Times New Roman,serif" font-size="14.00">shift_in(duration: float)</text>
-<text text-anchor="start" x="4642" y="-3461.3" font-family="Times New Roman,serif" font-size="14.00">shift_out(duration: float)</text>
-<text text-anchor="start" x="4642" y="-3446.3" font-family="Times New Roman,serif" font-size="14.00">visible(value: bool)</text>
+<polygon fill="none" stroke="black" points="4634,-3431 4634,-3620 5056,-3620 5056,-3431 4634,-3431"/>
+<text text-anchor="middle" x="4845" y="-3604.8" font-family="Times New Roman,serif" font-size="14.00">src.display.widget.button.Button</text>
+<polyline fill="none" stroke="black" points="4634,-3597 5056,-3597 "/>
+<text text-anchor="start" x="4642" y="-3581.8" font-family="Times New Roman,serif" font-size="14.00">_blur : int</text>
+<text text-anchor="start" x="4642" y="-3566.8" font-family="Times New Roman,serif" font-size="14.00">_on_mouse : bool</text>
+<text text-anchor="start" x="4642" y="-3551.8" font-family="Times New Roman,serif" font-size="14.00">_text</text>
+<text text-anchor="start" x="4642" y="-3536.8" font-family="Times New Roman,serif" font-size="14.00">_visible : bool</text>
+<text text-anchor="start" x="4642" y="-3521.8" font-family="Times New Roman,serif" font-size="14.00">visible : bool</text>
+<polyline fill="none" stroke="black" points="4634,-3514 5056,-3514 "/>
+<text text-anchor="start" x="4642" y="-3498.8" font-family="Times New Roman,serif" font-size="14.00">__init__(parent: Widget, rect, surface, text: str, on_press: Callable[[], ]): </text>
+<text text-anchor="start" x="4642" y="-3483.8" font-family="Times New Roman,serif" font-size="14.00">draw_begin(): </text>
+<text text-anchor="start" x="4642" y="-3468.8" font-family="Times New Roman,serif" font-size="14.00">shift_in(duration: float)</text>
+<text text-anchor="start" x="4642" y="-3453.8" font-family="Times New Roman,serif" font-size="14.00">shift_out(duration: float)</text>
+<text text-anchor="start" x="4642" y="-3438.8" font-family="Times New Roman,serif" font-size="14.00">visible(value: bool)</text>
 </g>
 <!-- src.display.widget.button.Button&#45;&gt;src.display.screen.game_screen.GameScreen -->
 <g id="edge57" class="edge"><title>src.display.widget.button.Button&#45;&gt;src.display.screen.game_screen.GameScreen</title>
@@ -1109,25 +1110,25 @@
 </g>
 <!-- src.display.widget.button.Button&#45;&gt;src.display.screen.game_screen.GameScreen -->
 <g id="edge58" class="edge"><title>src.display.widget.button.Button&#45;&gt;src.display.screen.game_screen.GameScreen</title>
-<path fill="none" stroke="black" d="M4834.39,-3612.53C4830.91,-3662.55 4831.13,-3726.32 4846,-3781 4853.34,-3807.99 4863.85,-3835.06 4876.08,-3861.24"/>
+<path fill="none" stroke="black" d="M4833.89,-3620.24C4830.97,-3668.99 4831.88,-3729.09 4846,-3781 4853.34,-3807.99 4863.85,-3835.06 4876.08,-3861.24"/>
 <polygon fill="black" stroke="black" points="4876.25,-3861.58 4882.45,-3865.26 4881.43,-3872.4 4875.23,-3868.72 4876.25,-3861.58"/>
 <text text-anchor="middle" x="4920" y="-3769.8" font-family="Times New Roman,serif" font-size="14.00" fill="green">_game_mode_pve_button</text>
 </g>
 <!-- src.display.widget.button.Button&#45;&gt;src.display.screen.game_screen.GameScreen -->
 <g id="edge59" class="edge"><title>src.display.widget.button.Button&#45;&gt;src.display.screen.game_screen.GameScreen</title>
-<path fill="none" stroke="black" d="M4912.85,-3612.62C4943.24,-3656.1 4976.19,-3711.16 4994,-3766 5000.89,-3787.21 5006.11,-3809.66 5010.04,-3832.38"/>
+<path fill="none" stroke="black" d="M4918.09,-3620.21C4946.97,-3662.41 4977.21,-3714.3 4994,-3766 5000.89,-3787.21 5006.11,-3809.66 5010.04,-3832.38"/>
 <polygon fill="black" stroke="black" points="5010.05,-3832.44 5014.96,-3837.72 5011.97,-3844.28 5007.06,-3839 5010.05,-3832.44"/>
 <text text-anchor="middle" x="5039" y="-3769.8" font-family="Times New Roman,serif" font-size="14.00" fill="green">_return_button</text>
 </g>
 <!-- src.display.widget.button.Button&#45;&gt;src.display.screen.game_screen.GameScreen -->
 <g id="edge60" class="edge"><title>src.display.widget.button.Button&#45;&gt;src.display.screen.game_screen.GameScreen</title>
-<path fill="none" stroke="black" d="M4965.62,-3612.71C5012.17,-3653.32 5060.13,-3706.06 5085,-3766 5093.74,-3787.07 5097.79,-3809.42 5098.46,-3832.09"/>
+<path fill="none" stroke="black" d="M4973.86,-3620.02C5017.75,-3659.57 5061.6,-3709.59 5085,-3766 5093.74,-3787.07 5097.79,-3809.42 5098.46,-3832.09"/>
 <polygon fill="black" stroke="black" points="5098.46,-3832.34 5102.47,-3838.33 5098.49,-3844.34 5094.47,-3838.35 5098.46,-3832.34"/>
 <text text-anchor="middle" x="5131" y="-3769.8" font-family="Times New Roman,serif" font-size="14.00" fill="green">_return_button</text>
 </g>
 <!-- src.display.widget.button.Button&#45;&gt;src.display.screen.game_screen.GameScreen -->
 <g id="edge61" class="edge"><title>src.display.widget.button.Button&#45;&gt;src.display.screen.game_screen.GameScreen</title>
-<path fill="none" stroke="black" d="M5025.91,-3612.73C5085.15,-3650.84 5144.14,-3701.78 5177,-3766 5203.29,-3817.38 5187.29,-3873.34 5157,-3923.25"/>
+<path fill="none" stroke="black" d="M5037.28,-3620.21C5092.6,-3657.42 5146.25,-3705.89 5177,-3766 5203.29,-3817.38 5187.29,-3873.34 5157,-3923.25"/>
 <polygon fill="black" stroke="black" points="5156.95,-3923.32 5157.13,-3930.53 5150.54,-3933.47 5150.37,-3926.26 5156.95,-3923.32"/>
 <text text-anchor="middle" x="5222" y="-3769.8" font-family="Times New Roman,serif" font-size="14.00" fill="green">_finish_button</text>
 </g>
@@ -1151,19 +1152,19 @@
 </g>
 <!-- src.display.widget.button.Button&#45;&gt;src.display.screen.main_screen.MainScreen -->
 <g id="edge65" class="edge"><title>src.display.widget.button.Button&#45;&gt;src.display.screen.main_screen.MainScreen</title>
-<path fill="none" stroke="black" d="M4727.32,-3612.71C4627.94,-3685.38 4500.67,-3778.05 4494,-3781 4060.32,-3972.77 3494.67,-4040.87 3234.39,-4063.13"/>
+<path fill="none" stroke="black" d="M4717.13,-3620.16C4619.45,-3691.55 4500.44,-3778.15 4494,-3781 4060.32,-3972.77 3494.67,-4040.87 3234.39,-4063.13"/>
 <polygon fill="black" stroke="black" points="3234.19,-4063.15 3228.55,-4067.64 3222.23,-4064.16 3227.87,-4059.67 3234.19,-4063.15"/>
 <text text-anchor="middle" x="4550" y="-3769.8" font-family="Times New Roman,serif" font-size="14.00" fill="green">_start_button</text>
 </g>
 <!-- src.display.widget.button.Button&#45;&gt;src.display.screen.main_screen.MainScreen -->
 <g id="edge66" class="edge"><title>src.display.widget.button.Button&#45;&gt;src.display.screen.main_screen.MainScreen</title>
-<path fill="none" stroke="black" d="M4769.62,-3612.58C4710.88,-3677.62 4632.67,-3759.29 4592,-3781 4138.4,-4023.13 3511.9,-4066 3234.26,-4072.54"/>
+<path fill="none" stroke="black" d="M4762.69,-3620.23C4704.86,-3683.88 4631.09,-3760.13 4592,-3781 4138.4,-4023.13 3511.9,-4066 3234.26,-4072.54"/>
 <polygon fill="black" stroke="black" points="3234.11,-4072.55 3228.2,-4076.68 3222.11,-4072.81 3228.03,-4068.68 3234.11,-4072.55"/>
 <text text-anchor="middle" x="4656" y="-3769.8" font-family="Times New Roman,serif" font-size="14.00" fill="green">_history_button</text>
 </g>
 <!-- src.display.widget.button.Button&#45;&gt;src.display.screen.main_screen.MainScreen -->
 <g id="edge67" class="edge"><title>src.display.widget.button.Button&#45;&gt;src.display.screen.main_screen.MainScreen</title>
-<path fill="none" stroke="black" d="M4819.31,-3612.66C4797.9,-3669.33 4761.6,-3740.29 4705,-3781 4469.1,-3950.65 3583.23,-4035.44 3234.4,-4062.81"/>
+<path fill="none" stroke="black" d="M4816.44,-3620.12C4794.71,-3675.43 4759.14,-3742.06 4705,-3781 4469.1,-3950.65 3583.23,-4035.44 3234.4,-4062.81"/>
 <polygon fill="black" stroke="black" points="3234.19,-4062.83 3228.52,-4067.28 3222.22,-4063.76 3227.89,-4059.31 3234.19,-4062.83"/>
 <text text-anchor="middle" x="4771" y="-3769.8" font-family="Times New Roman,serif" font-size="14.00" fill="green">_statistic_button</text>
 </g>
@@ -1199,7 +1200,7 @@
 </g>
 <!-- src.display.widget.button.Button&#45;&gt;src.display.screen.main_screen.MainScreen -->
 <g id="edge73" class="edge"><title>src.display.widget.button.Button&#45;&gt;src.display.screen.main_screen.MainScreen</title>
-<path fill="none" stroke="black" d="M4671.44,-3612.54C4589.1,-3655.52 4490.48,-3710.18 4406,-3766 4397.02,-3771.93 4396.71,-3776.37 4387,-3781 3995.76,-3967.6 3480.42,-4037.62 3234.5,-4061.65"/>
+<path fill="none" stroke="black" d="M4656.98,-3620.12C4577.73,-3661.85 4485.59,-3713.41 4406,-3766 4397.02,-3771.93 4396.71,-3776.37 4387,-3781 3995.76,-3967.6 3480.42,-4037.62 3234.5,-4061.65"/>
 <polygon fill="black" stroke="black" points="3234.22,-4061.67 3228.63,-4066.23 3222.27,-4062.83 3227.86,-4058.27 3234.22,-4061.67"/>
 <text text-anchor="middle" x="4448" y="-3769.8" font-family="Times New Roman,serif" font-size="14.00" fill="green">_delete_button</text>
 </g>
@@ -1231,8 +1232,8 @@
 </g>
 <!-- src.display.widget.button.Button.Text&#45;&gt;src.display.widget.button.Button -->
 <g id="edge74" class="edge"><title>src.display.widget.button.Button.Text&#45;&gt;src.display.widget.button.Button</title>
-<path fill="none" stroke="black" d="M5403.51,-2941.15C5283.28,-3066.73 5060.67,-3299.24 4935.87,-3429.59"/>
-<polygon fill="black" stroke="black" points="4935.72,-3429.74 4934.46,-3436.84 4927.42,-3438.41 4928.68,-3431.31 4935.72,-3429.74"/>
+<path fill="none" stroke="black" d="M5403.51,-2941.15C5285.59,-3064.32 5069.2,-3290.33 4943.18,-3421.95"/>
+<polygon fill="black" stroke="black" points="4942.94,-3422.21 4941.68,-3429.31 4934.64,-3430.87 4935.9,-3423.77 4942.94,-3422.21"/>
 <text text-anchor="middle" x="5161" y="-3238.8" font-family="Times New Roman,serif" font-size="14.00" fill="green">_text</text>
 </g>
 <!-- src.display.widget.input_box.InputBox&#45;&gt;src.display.screen.game_screen.GameScreen -->
