@@ -65,7 +65,7 @@ class Widget:
     def visible(self, value: bool):
         self._visible = value
 
-    def event_handler(self, event: pygame.event.Event):
+    def event_handler(self, event: pygame.event.Event) -> None:
         """Event handler to the widget.
 
         Args:
@@ -107,7 +107,4 @@ class Widget:
                 flag_list.remove(flag)
 
     def draw_end(self) -> None:
-        pass
-
-    def __del__(self) -> None:
         pass
