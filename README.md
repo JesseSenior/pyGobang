@@ -8,7 +8,7 @@ A python based gobang game.
 
 ## Status
 
-The game is currently still in development, so **there may be a huge amount of bugs**. :(
+The game has currently been released version v0.1.0, currently to basically complete the functional goals, but still **may exist huge amount of bugs**. :(
 
 If you find bugs, welcome to point out ~~~
 
@@ -17,6 +17,8 @@ The game uses pygame as the graphics engine and uses sqlite to record historical
 The game currently uses Monte Carlo Search Trees (MCTS) to implement the human-computer part, and will be optimized opportunistically afterwards.
 
 The game font is the open source font [Sarasa-Mono-SC-Nerd](https://github.com/laishulu/Sarasa-Mono-SC-Nerd).
+
+The game demo has been released on [bilibili](https://www.bilibili.com/video/BV1iL4y1N79m).
 
 *A big thank you to my friends @Charholer and @Vokain for the music as well as the sound support.*
 

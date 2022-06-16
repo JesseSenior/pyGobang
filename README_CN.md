@@ -8,7 +8,7 @@
 
 ## 状态
 
-游戏当前仍处在开发中，因此**可能存在巨量BUG**。 :(
+游戏当前已发布版本v0.1.0，目前以基本完成功能性目标，但仍然**可能存在巨量BUG**。 :(
 
 如果发现BUG，欢迎指出~~~
 
@@ -17,6 +17,8 @@
 游戏目前使用蒙特卡洛搜索树(MCTS)实现人机对战部分，之后会择机优化。
 
 游戏字体为开源字体[Sarasa-Mono-SC-Nerd](https://github.com/laishulu/Sarasa-Mono-SC-Nerd)。
+
+游戏demo已发布于[bilibili](https://www.bilibili.com/video/BV1iL4y1N79m)。
 
 *衷心感谢我的朋友@Charholer和@Vokain提供的音乐以及音效支持。*
 
