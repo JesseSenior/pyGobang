@@ -96,9 +96,12 @@ class HumanUIPlayer(UIPlayer):
                 pygame.mixer.Sound("res/sound/sound2.ogg").play()
 
     def stop_play(self) -> None:
-        self._board_ui._handlers[MOUSEBUTTONDOWN].remove(
-            self._mouse_button_down
-        )
+        try:
+            self._board_ui._handlers[MOUSEBUTTONDOWN].remove(
+                self._mouse_button_down
+            )
+        except:
+            pass
 
 
 class RobotUIPlayer(UIPlayer, RobotPlayer):
@@ -204,44 +207,45 @@ class BoardUI(Widget):
             )
 
     def place_a_piece(self, pos: Tuple[int, int]):
-        if self.editable:
-            try:
-                piece = BoardUI.Piece(
-                    self,
-                    self._surface.get_rect(),
-                    self._surface_raw,
-                    pos,
-                    self._board,
-                )
-                self._sub_widgets.append(piece)
-                self._current_player = (self._current_player + 1) % len(
-                    self._player_list
-                )
-                self._player.stop_play()
-                self._player = self._player_list[self._current_player](self)
-            except:
-                pass
+        if not self.editable:
+            return
+
+        try:
+            piece = BoardUI.Piece(
+                self,
+                self._surface.get_rect(),
+                self._surface_raw,
+                pos,
+                self._board,
+            )
+        except:
+            return
+        self._sub_widgets.append(piece)
+        self._current_player = self._board._current_side
+
+        self._player.stop_play()
+        if self._board.winner == None:
+            self._player = self._player_list[self._current_player](self)
 
     def cancel(self, step: int):
-        if self.editable:
-            try:
-                for i in range(step):
-                    self._board.cancel()
-                    t = -1
-                    while not self._sub_widgets[t].visible:
-                        t -= 1
-                    t = t + len(self._sub_widgets)
-                    self._sub_widgets[t].visible = False
-                    self._last_sub_widgets.append(self._sub_widgets[t])
-                    self._sub_widgets.remove(self._sub_widgets[t])
+        if not self.editable:
+            return
+        
+        try:
+            for i in range(step):
+                self._board.cancel()
+                t = -1
+                while not self._sub_widgets[t].visible:
+                    t -= 1
+                self._sub_widgets[t].visible = False
+                self._last_sub_widgets.append(self._sub_widgets[t])
+                self._sub_widgets.remove(self._sub_widgets[t])
+        except:
+            return
+        self._current_player = self._board._current_side
 
-                self._current_player = self._current_player - step
-                while self._current_player < 0:
-                    self._current_player += len(self._player_list)
-                self._player.stop_play()
-                self._player = self._player_list[self._current_player](self)
-            except:
-                pass
+        self._player.stop_play()
+        self._player = self._player_list[self._current_player](self)
 
     def draw_begin(self) -> None:
         self._board_background.draw()
