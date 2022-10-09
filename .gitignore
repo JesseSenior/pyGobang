@@ -1,5 +1,7 @@
 # Others
 /data.db
+/pyGobang*.exe
+/pyGobang.*/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -28,7 +28,13 @@ from pygame.constants import (
 from typing import List
 
 from src.display.widget import Widget
-from src.constants import COLOR_RED, COLOR_TRANSPARENT, COLOR_WHITE, TEXT_FONT
+from src.constants import (
+    COLOR_RED,
+    COLOR_TRANSPARENT,
+    COLOR_WHITE,
+    TEXT_FONT,
+    getpath,
+)
 from src.display.effect import alpha_effect, blur_effect, surface_blur
 
 
@@ -70,7 +76,7 @@ class Table(Widget):
                         self._active_item != y + self._display_offset
                         and len(self._sub_widgets) > y + self._display_offset
                     ):
-                        pygame.mixer.Sound("res/sound/sound1.ogg").play()
+                        pygame.mixer.Sound(getpath("sound/sound1.ogg")).play()
                         self._sub_widgets[self._active_item].active = False
                         self._active_item = y + self._display_offset
                         self._sub_widgets[self._active_item].active = True

@@ -17,6 +17,12 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 File: pyGobang.py
 Description: Game entry point.
 """
+import os
+
+os.environ["PYGOBANG_DATAPATH"] = os.path.join(
+    os.path.dirname(__file__), "res/"
+)
+
 from src.main import main
 
 if __name__ == "__main__":
