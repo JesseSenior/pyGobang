@@ -23,7 +23,7 @@ from pygame.constants import MOUSEBUTTONDOWN, BUTTON_LEFT, MOUSEMOTION
 from typing import Callable
 
 from src.display.widget import Widget
-from src.constants import COLOR_TRANSPARENT, TEXT_FONT
+from src.constants import COLOR_TRANSPARENT, TEXT_FONT, getpath
 from src.display.effect import alpha_effect, blur_effect, surface_blur
 
 
@@ -52,7 +52,7 @@ class Button(Widget):
                     ).collidepoint(event.pos)
                     and event.button == BUTTON_LEFT
                 ):
-                    pygame.mixer.Sound("res/sound/sound2.ogg").play()
+                    pygame.mixer.Sound(getpath("sound/sound2.ogg")).play()
                     on_press()
 
         self._handlers[MOUSEBUTTONDOWN].append(_mouse_button_down)
@@ -65,7 +65,7 @@ class Button(Widget):
                     *self._surface.get_abs_offset(), *self._surface.get_size()
                 ).collidepoint(event.pos):
                     if not self._on_mouse:
-                        pygame.mixer.Sound("res/sound/sound1.ogg").play()
+                        pygame.mixer.Sound(getpath("sound/sound1.ogg")).play()
                         self._on_mouse = True
                 else:
                     self._on_mouse = False

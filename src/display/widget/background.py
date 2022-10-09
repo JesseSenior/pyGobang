@@ -29,6 +29,7 @@ from src.constants import (
     COLOR_BLACK,
     COLOR_TRANSPARENT,
     WINDOW_SIZE,
+    getpath,
 )
 from src.display.effect import mosaic_effect, alpha_effect, surface_blur
 from src.display.texture import generate_texture
@@ -38,7 +39,7 @@ class Background(Widget):
     def __init__(
         self,
         size: Tuple[int, int] = WINDOW_SIZE,
-        img_path="res/image/background.png",
+        img_path=getpath("image/background.png"),
         default_color=COLOR_BACKGROUND,
         enable_shader=True,
     ) -> None:

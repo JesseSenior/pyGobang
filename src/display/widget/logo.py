@@ -21,6 +21,7 @@ from __future__ import annotations
 import pygame
 from random import choice
 from typing import Tuple
+from src.constants import getpath
 
 from src.display.widget import Widget
 from src.display.effect import alpha_effect
@@ -31,7 +32,12 @@ class LOGO(Widget):
         self, parent: Widget, pos: Tuple[int, int], scale: float
     ) -> None:
         self._logo_img = pygame.image.load(
-            choice(["res/image/LOGO_dark.png", "res/image/LOGO_light.png"])
+            choice(
+                [
+                    getpath("image/LOGO_dark.png"),
+                    getpath("image/LOGO_light.png"),
+                ]
+            )
         ).convert_alpha()
         parent_surface_size = parent.surface.get_size()
         rect = pygame.Rect(*pos, 0, 0).inflate(

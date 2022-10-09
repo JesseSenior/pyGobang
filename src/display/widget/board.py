@@ -40,6 +40,7 @@ from src.constants import (
     COLOR_RED,
     COLOR_TRANSPARENT,
     COLOR_WHITE,
+    getpath,
 )
 from src.core import Board
 from src.display.widget.background import Background
@@ -93,7 +94,7 @@ class HumanUIPlayer(UIPlayer):
             x, y = int(x), int(y)
             if 1 <= x <= self._col and 1 <= y <= self._row:
                 self._board_ui.place_a_piece((x - 1, y - 1))
-                pygame.mixer.Sound("res/sound/sound2.ogg").play()
+                pygame.mixer.Sound(getpath("sound/sound2.ogg")).play()
 
     def stop_play(self) -> None:
         try:
@@ -118,7 +119,7 @@ class RobotUIPlayer(UIPlayer, RobotPlayer):
         move = self.mcts.get_move(self.board)
         self.mcts.update_with_move(move, False)
         self._board_ui.place_a_piece(move)
-        pygame.mixer.Sound("res/sound/sound2.ogg").play()
+        pygame.mixer.Sound(getpath("sound/sound2.ogg")).play()
 
 
 class BoardUI(Widget):
@@ -132,7 +133,7 @@ class BoardUI(Widget):
     ) -> None:
         super().__init__(parent, rect, surface)
         self._board_background = Background(
-            rect.size, "res/image/background2.png", COLOR_BOARD, False
+            rect.size, getpath("image/background2.png"), COLOR_BOARD, False
         )
         self._surface_raw = pygame.Surface(self._surface.get_size())
         self._surface_raw.set_alpha(0)
@@ -230,7 +231,7 @@ class BoardUI(Widget):
     def cancel(self, step: int):
         if not self.editable:
             return
-        
+
         try:
             for i in range(step):
                 self._board.cancel()

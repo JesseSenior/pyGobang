@@ -36,6 +36,8 @@ class BoardDatabase:
     """Database to save boards.
     
     Functions:
+        __init__([database_path]):
+            Open the database.
         append(board_to_save):
             Append the board to the database.
         export():

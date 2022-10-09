@@ -28,7 +28,7 @@ from pygame.constants import (
 from pygame.freetype import STYLE_UNDERLINE
 
 from src.display.widget import Widget
-from src.constants import COLOR_TRANSPARENT, COLOR_WHITE, TEXT_FONT
+from src.constants import COLOR_TRANSPARENT, COLOR_WHITE, TEXT_FONT, getpath
 from src.display.effect import alpha_effect, blur_effect, surface_blur
 
 
@@ -147,7 +147,8 @@ class InputBox(Widget):
 
         def onexit():
             self._activate = True
-        pygame.mixer.Sound("res/sound/sound1.ogg").play()
+
+        pygame.mixer.Sound(getpath("sound/sound1.ogg")).play()
         self._flags.append(
             alpha_effect(
                 self._activate_background,

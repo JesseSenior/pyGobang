@@ -22,11 +22,11 @@ The game demo has been released on [bilibili](https://www.bilibili.com/video/BV1
 
 *A big thank you to my friends @Charholer and @Vokain for the music as well as the sound support.*
 
-## How to Play
+## Installation
 
 Download the (soon to be released) release version, or clone the project locally and run it, as described in the [Configuring the Environment section](#1-configuring-the-environment) below.
 
-## How to Pack
+## Build a release
 
 ### 1 Configuring the environment
 

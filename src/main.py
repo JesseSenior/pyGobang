@@ -22,7 +22,7 @@ Description:
 """
 import pygame
 
-from src.constants import WINDOW_SIZE
+from src.constants import WINDOW_SIZE, getpath
 from src.display.screen import screen_list
 
 
@@ -30,10 +30,10 @@ def main():
     pygame.init()
     pygame.display.set_mode(WINDOW_SIZE)
     pygame.display.set_caption("pyGobang, a python based Gobang game")
-    icon = pygame.image.load("res/image/icon.png").convert_alpha()
+    icon = pygame.image.load(getpath("image/icon.png")).convert_alpha()
     pygame.display.set_icon(icon)
-    pygame.mixer.music.load("res/sound/background_music.ogg")
-    pygame.mixer.music.play(-1,fade_ms=6000)
+    pygame.mixer.music.load(getpath("sound/background_music.ogg"))
+    pygame.mixer.music.play(-1, fade_ms=6000)
     screen_status = 1
     while screen_status != 0:
         screen_status = screen_list[screen_status]().loop()

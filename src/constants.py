@@ -39,11 +39,20 @@ TEXTURE_BLOCK_SIZE = 160
 SELECT_ATTEMPT = 1000
 OVERLAY_SCALE = 4
 
+import os
+
+DATAPATH = os.getenv("PYGOBANG_DATAPATH")
+
+
+def getpath(path):
+    return os.path.join(DATAPATH, path)
+
+
 AI_ABILITY = 7500
 
 pygame.freetype.init()
 TEXT_FONT = pygame.freetype.Font(
-    "res/font/sarasa-mono-sc-nerd/sarasa-mono-sc-nerd-regular.ttf",
+    getpath("font/sarasa-mono-sc-nerd/sarasa-mono-sc-nerd-regular.ttf"),
     floor(min(WINDOW_SIZE) / 100 * 5),
 )
 
