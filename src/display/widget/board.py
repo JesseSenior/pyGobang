@@ -45,6 +45,7 @@ from src.constants import (
 from src.core import Board
 from src.display.widget.background import Background
 from src.players import Player, RobotPlayer
+import src.ai
 
 
 class UIPlayer(Player):
@@ -114,10 +115,8 @@ class RobotUIPlayer(UIPlayer, RobotPlayer):
 
     def place_a_piece(self) -> None:
         assert len(self.board.available_place) > 0
-        if len(self.board.kifu) > 0:
-            self.mcts.update_with_move(self.board.kifu[-1], False)
-        move = self.mcts.get_move(self.board)
-        self.mcts.update_with_move(move, False)
+
+        move = src.ai.get_move(self.board)
         self._board_ui.place_a_piece(move)
         pygame.mixer.Sound(getpath("sound/sound2.ogg")).play()
 

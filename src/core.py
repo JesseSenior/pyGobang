@@ -94,7 +94,7 @@ class Board:
         return self._BOARD_SIZE
 
     @property
-    def current_side(self) -> int:
+    def current_side(self) -> bool:
         """Current player's side.
 
         Returns:
@@ -123,7 +123,7 @@ class Board:
         Returns:
             List[Tuple[int,int]]: List of the position to the pieces.
         """
-        return None if self._winpath==None else self._winpath.copy()
+        return None if self._winpath == None else self._winpath.copy()
 
     @property
     def board(self):

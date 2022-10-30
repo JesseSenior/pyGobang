@@ -73,7 +73,7 @@ if __name__ == "__main__":
     system("pause")
 
     # Robot vs Player
-    players = [RobotPlayer(test_board, n_playout=6000), HumanPlayer(test_board)]
+    players = [RobotPlayer(test_board), HumanPlayer(test_board)]
     # Player vs Player
     # players = [HumanPlayer(test_board), HumanPlayer(test_board)]
     current_player = 0

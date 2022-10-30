@@ -180,7 +180,7 @@ class GameScreen(Screen):
 
         def set_player_name():
             self._board = Board(
-                (9, 9) if self._game_mode else src.constants.DEFAULT_BOARD_SIZE,
+                src.constants.DEFAULT_BOARD_SIZE,
                 competitor_black=self._player_A_name_input_box.text,
                 competitor_white=self._player_B_name_input_box.text
                 if self._game_mode == 0
@@ -489,7 +489,7 @@ class PieceStatus(Widget):
         self._surface_raw_final.fill(COLOR_TRANSPARENT)
         self._surface_raw_final.set_alpha(0)
         self._visible = False
-        
+
     def draw_begin(self) -> None:
         status = (
             self._board.current_side
