@@ -8,13 +8,13 @@
 
 ## 状态
 
-游戏当前已发布版本v0.1.0，目前以基本完成功能性目标，但仍然**可能存在巨量BUG**。 :(
+游戏当前已发布版本v0.1.1，目前以基本完成功能性目标，但仍然**可能存在巨量BUG**。 :(
 
-如果发现BUG，欢迎指出~~~
+如果发现BUG，欢迎写issue踢我~😉
 
 游戏使用pygame作为图形引擎，利用sqlite记录历史棋局。
 
-游戏目前使用蒙特卡洛搜索树(MCTS)实现人机对战部分，之后会择机优化。
+游戏人机对战部分修改自@Xshellye的开源项目[GoBang-python-homework](https://github.com/Xshellye/GoBang-python-homework)。
 
 游戏字体为开源字体[Sarasa-Mono-SC-Nerd](https://github.com/laishulu/Sarasa-Mono-SC-Nerd)。
 
@@ -27,6 +27,8 @@
 下载（即将发布的）release版本，或者clone本项目至本地后运行，具体参看下文[配置环境](#1-配置环境)部分。
 
 ## 如何构建
+
+**注意：目前游戏仅编写了windows环境下构建脚本！**
 
 ### 1 配置环境
 
@@ -47,7 +49,7 @@ conda activate pyGobang_env
 
 ```sh
 cd script
-./build.ps1
+./build_win.ps1
 ```
 
-等待脚本结束后，即可在脚本"dist"目录下得到游戏可执行文件。
+等待脚本结束后，即可在项目根目录下得到游戏可执行文件（通常命名为“pyGobang_Win_(PROCESSOR_ARCHITECTURE).exe”）。

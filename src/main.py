@@ -33,7 +33,7 @@ def main():
     icon = pygame.image.load(getpath("image/icon.png")).convert_alpha()
     pygame.display.set_icon(icon)
     pygame.mixer.music.load(getpath("sound/background_music.ogg"))
-    pygame.mixer.music.play(-1, fade_ms=6000)
+    pygame.mixer.music.play(-1, fade_ms=3000)
     screen_status = 1
     while screen_status != 0:
         screen_status = screen_list[screen_status]().loop()

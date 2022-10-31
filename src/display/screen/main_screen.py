@@ -253,7 +253,7 @@ class MainScreen(Screen):
                         self._history_table._active_item
                     ].timestamp
                 )
-                self._board.load_board(Board())
+                self._board.load_board()
                 self._history_table.refresh()
 
         self._delete_button = Button(
@@ -388,7 +388,7 @@ class MainScreen(Screen):
                 self._text_list = text_list
 
         def shift_in(self, duration: float):
-            self._parent._board.load_board(Board())
+            self._parent._board.load_board()
             self._parent._board.editable = False
             self.refresh()
             return super().shift_in(duration)
@@ -454,7 +454,7 @@ class MainScreen(Screen):
                     and type(tmp[1]) == int
                 ):
                     src.constants.DEFAULT_BOARD_SIZE = tmp
-                    self._parent._board.load_board(Board())
+                    self._parent._board.load_board()
                     self.text_hint = str(tmp)
             except:
                 pass
@@ -540,7 +540,7 @@ class MainScreen(Screen):
             self._board._board.winner != None
             or len(self._board._board.available_place) == 0
         ):
-            self._board.load_board(Board())
+            self._board.load_board()
 
     def draw_end(self) -> None:
         if not self.visible:

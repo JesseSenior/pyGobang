@@ -17,10 +17,9 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 File: src/players.py
 Description: 
     A collection of the players, which is the general way to interact with the 
-    board. The partial code of MCTS is modified from the open source project 
-    AlphaZero-Gomoku(https://github.com/junxiaosong/AlphaZero_Gomoku) licensed 
-    under the MIT License. Thanks to their genius work!
+    board. 
 """
+from typing import Tuple
 import numpy as np
 from random import choice
 from copy import deepcopy
@@ -36,43 +35,50 @@ class Player:
     """
 
     def __init__(self, playing_board: Board) -> None:
+        """Initialize the player with current playing board.
+        
+        Args:
+            playing_board (Board): Current playing board.
+        """
         self.board = playing_board
 
-    def place_a_piece(self) -> None:
+    def get_move(self) -> Tuple[int, int]:
+        """Attempt to get player's move.
+        
+        Notice:
+            This function should NOT place any pieces!
+        
+        Returns:
+            Tuple[int, int]: Move of player.
+        """
         pass
 
-    def stop_play(self) -> None:
-        pass
+    def place_a_piece(self) -> None:
+        self.board.place(*self.get_move())
 
 
 class MonkeyPlayer(Player):
     """🐵: A cute monkey player, you will like it :)
     """
 
-    def place_a_piece(self) -> None:
-        self.board.place(*choice(list(self.board.available_place)))
+    def get_move(self) -> Tuple[int, int]:
+        return choice(list(self.board.available_place))
 
 
 class RobotPlayer(Player):
     """🤖: A cute robot player. Smarter than monkey :)
-    
-    Copyright statement: 
-        The partial code of MCTS is modified from the open source project 
-        AlphaZero-Gomoku(https://github.com/junxiaosong/AlphaZero_Gomoku) 
-        licensed under the MIT License. Thanks to their genius work!
     """
 
-    def place_a_piece(self) -> None:
-        assert len(self.board.available_place) > 0
-
-        move = src.ai.get_move(self.board)
-        self.board.place(*move)
+    def get_move(self) -> Tuple[int, int]:
+        return src.ai.get_move(self.board)
 
 
 class HumanPlayer(Player):
     """😉: A cute human player. Smarter than robot, probably :)
     """
 
-    def place_a_piece(self) -> None:
-        c, r = map(int, input("Choose your column, row:").split())
-        self.board.place(c, r)
+    def get_move(self) -> Tuple[int, int]:
+        move = tuple(map(int, input("Choose your column, row:").split()))
+        assert move in self.board.available_place
+
+        return move

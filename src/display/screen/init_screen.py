@@ -44,7 +44,7 @@ class InitScreen(Screen):
         self._visible = False
         self.visible = True
         self._flags.append(
-            delayed_flag(self._flags, lambda: self.goto_main_screen(self), 3)
+            delayed_flag(self._flags, lambda: self.goto_main_screen(self), 1.5)
         )
 
     class goto_main_screen(Flag):

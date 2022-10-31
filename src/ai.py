@@ -1,6 +1,6 @@
 """pyGobang, a python based Gobang game.
 
-Copyright (C) 2022 Xshellye
+Copyright (C) 2022 Xshellye modified by Jesse Senior
 
 This program is free software: you can redistribute it and/or modify it under 
 the terms of the GNU General Public License as published by the Free Software 
@@ -16,24 +16,15 @@ this program. If not, see <http://www.gnu.org/licenses/>.
 
 File: src/ai.py
 Description: 🤖AI part of pyGobang.
+Copyright statement: 
+    The partial code of Minmax algorithm is modified from a open source project 
+    GoBang-python-homework (https://github.com/Xshellye/GoBang-python-homework) 
+    Thanks to their genius work!
 """
 
-from turtle import down
 from typing import Tuple
-import numpy as np
-from random import choice
-from copy import deepcopy
-from operator import itemgetter
 
-import src.constants
 from src.core import Board
-
-
-class Point:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
 
 LEFT_RIGHT = 0
 TOP_BOTTOM = 1
@@ -41,16 +32,16 @@ LEFTTOP_RIGHTBOTTOM = 2
 RIGHTTOP_LEFTBOTTOM = 3
 
 
-class Chess:
+class BoardAI:
     def __init__(self, chessdata):
-        self.chessData = chessdata  # 1表示自己 0表示空 -1表示对手
-        self.Row = len(chessdata)
-        self.Col = len(chessdata[0])
+        self._chess_data = chessdata  # 1 for self, 0 for empty, -1 for opponent
+        self._row = len(chessdata)
+        self._col = len(chessdata[0])
 
-    def GetGrade(self, point, index):
+    def get_grade(self, point, index):
         grade = 0
         for k in range(4):
-            count1, count2, isWall = self.Count(point, index, k)
+            count1, count2, wall = self.count(point, index, k)
             tempGrade = 0
             if count1 >= 5:
                 return 100000
@@ -72,24 +63,23 @@ class Chess:
             elif count1 == 1 and count2 < 5:
                 tempGrade = 1
 
-            if isWall:
+            if wall:
                 grade += (tempGrade) * 0.3
             else:
                 grade += tempGrade
         return grade
 
-    def DownChess(self, index):
+    def down_chess(self, index):
         MaxGrade = 0
         MaxPoint = None
-        point = Point(0, 0)
-        for i in range(self.Row):
-            for j in range(self.Col):
-                if self.chessData[i][j] != 0:
+        point = (0, 0)
+        for i in range(self._row):
+            for j in range(self._col):
+                if self._chess_data[i][j] != 0:
                     continue
-                point.x = i
-                point.y = j
-                myGrade = self.GetGrade(point, index)
-                enemyGrade = self.GetGrade(point, -index)
+                point = (i, j)
+                myGrade = self.get_grade(point, index)
+                enemyGrade = self.get_grade(point, -index)
                 if myGrade >= 100000:
                     myGrade = 199999
                 if myGrade >= 1600:
@@ -101,60 +91,65 @@ class Chess:
                 grade = max(myGrade, enemyGrade)
                 if grade > MaxGrade:
                     MaxGrade = grade
-                    MaxPoint = Point(point.x, point.y)
-        self.chessData[MaxPoint.x][MaxPoint.y] = index
+                    MaxPoint = point
+        self._chess_data[MaxPoint[0]][MaxPoint[1]] = index
         return MaxPoint
 
-    def Count(self, point, index, direction):
-        x = point.x
-        y = point.y
-        isWall = False
+    def count(self, point, index, direction):
+        x, y = point
+        wall = False
         fg = 0
         count1 = count2 = 1
         if direction == LEFT_RIGHT:
             for i in range(y - 1, -1, -1):
-                if self.chessData[x][i] == index and fg == 0:
+                if self._chess_data[x][i] == index and fg == 0:
                     count1 += 1
                     count2 += 1
-                    if i - 1 > -1 and self.chessData[x][i - 1] == -index:
-                        isWall = True
-                elif self.chessData[x][i] == 0:
+                    if i - 1 > -1 and self._chess_data[x][i - 1] == -index:
+                        wall = True
+                elif self._chess_data[x][i] == 0:
                     count2 += 1
                     fg = 1
                 else:
                     break
             fg = 0
-            for i in range(y + 1, self.Col):
-                if self.chessData[x][i] == index and fg == 0:
+            for i in range(y + 1, self._col):
+                if self._chess_data[x][i] == index and fg == 0:
                     count1 += 1
                     count2 += 1
-                    if i + 1 < self.Col and self.chessData[x][i + 1] == -index:
-                        isWall = True
-                elif self.chessData[x][i] == 0:
+                    if (
+                        i + 1 < self._col
+                        and self._chess_data[x][i + 1] == -index
+                    ):
+                        wall = True
+                elif self._chess_data[x][i] == 0:
                     count2 += 1
                     fg = 1
                 else:
                     break
         if direction == TOP_BOTTOM:
             for i in range(x - 1, -1, -1):
-                if self.chessData[i][y] == index and fg == 0:
+                if self._chess_data[i][y] == index and fg == 0:
                     count1 += 1
                     count2 += 1
-                    if i - 1 > -1 and self.chessData[i - 1][y] == -index:
-                        isWall = True
-                elif self.chessData[i][y] == 0:
+                    if i - 1 > -1 and self._chess_data[i - 1][y] == -index:
+                        wall = True
+                elif self._chess_data[i][y] == 0:
                     count2 += 1
                     fg = 1
                 else:
                     break
             fg = 0
-            for i in range(x + 1, self.Row):
-                if self.chessData[i][y] == index and fg == 0:
+            for i in range(x + 1, self._row):
+                if self._chess_data[i][y] == index and fg == 0:
                     count1 += 1
                     count2 += 1
-                    if i + 1 < self.Row and self.chessData[i + 1][y] == -index:
-                        isWall = True
-                elif self.chessData[i][y] == 0:
+                    if (
+                        i + 1 < self._row
+                        and self._chess_data[i + 1][y] == -index
+                    ):
+                        wall = True
+                elif self._chess_data[i][y] == 0:
                     count2 += 1
                     fg = 1
                 else:
@@ -162,94 +157,83 @@ class Chess:
         if direction == LEFTTOP_RIGHTBOTTOM:
             n = min(x, y)
             for i in range(1, n):
-                if self.chessData[x - i][y - i] == index and fg == 0:
+                if self._chess_data[x - i][y - i] == index and fg == 0:
                     count1 += 1
                     count2 += 1
                     if (
                         x - i - 1 > -1
                         and y - i - 1 > -1
-                        and self.chessData[x - i - 1][y - i - 1] == -index
+                        and self._chess_data[x - i - 1][y - i - 1] == -index
                     ):
-                        isWall = True
-                elif self.chessData[x - i][y - i] == 0:
+                        wall = True
+                elif self._chess_data[x - i][y - i] == 0:
                     count2 += 1
                     fg = 1
                 else:
                     break
             fg = 0
-            n = self.Row - max(x, y)
+            n = self._row - max(x, y)
             for i in range(1, n):
-                if self.chessData[x + i][y + i] == index and fg == 0:
+                if self._chess_data[x + i][y + i] == index and fg == 0:
                     count1 += 1
                     count2 += 1
                     if (
                         x + i + 1 < n
                         and y + i + 1 < n
-                        and self.chessData[x + i + 1][y + i + 1] == -index
+                        and self._chess_data[x + i + 1][y + i + 1] == -index
                     ):
-                        isWall = True
-                elif self.chessData[x + i][y + i] == 0:
+                        wall = True
+                elif self._chess_data[x + i][y + i] == 0:
                     count2 += 1
                     fg = 1
                 else:
                     break
         if direction == RIGHTTOP_LEFTBOTTOM:
-            n = min(x, self.Row - y)
+            n = min(x, self._row - y)
             for i in range(1, n):
-                if self.chessData[x - i][y + i] == index and fg == 0:
+                if self._chess_data[x - i][y + i] == index and fg == 0:
                     count1 += 1
                     count2 += 1
                     if (
                         x - i - 1 > -1
                         and y + i + 1 < n
-                        and self.chessData[x - i - 1][y + i + 1] == -index
+                        and self._chess_data[x - i - 1][y + i + 1] == -index
                     ):
-                        isWall = True
-                elif self.chessData[x - i][y + i] == 0:
+                        wall = True
+                elif self._chess_data[x - i][y + i] == 0:
                     count2 += 1
                     fg = 1
                 else:
                     break
             fg = 0
-            n = min(self.Row - x, y)
+            n = min(self._row - x, y)
             for i in range(1, n):
-                if self.chessData[x + i][y - i] == index and fg == 0:
+                if self._chess_data[x + i][y - i] == index and fg == 0:
                     count1 += 1
                     count2 += 1
                     if (
                         x + i + 1 < n
                         and y - i - 1 > -1
-                        and self.chessData[x + i + 1][y - i - 1] == -index
+                        and self._chess_data[x + i + 1][y - i - 1] == -index
                     ):
-                        isWall = True
-                elif self.chessData[x + i][y - i] == 0:
+                        wall = True
+                elif self._chess_data[x + i][y - i] == 0:
                     count2 += 1
                     fg = 1
                 else:
                     break
-        return count1, count2, isWall
-
-    def JudgeWin_Lose(self, point, index):
-        for i in range(4):
-            if self.Count(point, index, i)[0] >= 5:
-                return True
+        return count1, count2, wall
 
 
 def get_move(board: Board) -> Tuple[int, int]:
-    currenctside = board.current_side
-    tmpboard = board.board
-    for i in range(len(tmpboard)):
-        for j in range(len(tmpboard[0])):
-            if tmpboard[i][j] == -1:
-                tmpboard[i][j] = 0
-            elif tmpboard[i][j] == 0 and currenctside == False:
-                tmpboard[i][j] = 1
-            elif tmpboard[i][j] == 0 and currenctside == True:
-                tmpboard[i][j] = -1
-            elif tmpboard[i][j] == 1 and currenctside == True:
-                tmpboard[i][j] = 1
-            elif tmpboard[i][j] == 1 and currenctside == False:
-                tmpboard[i][j] = -1
-    aibot = Chess(tmpboard)
-    point = aibot.DownChess(-1)
-    return (point.x, point.y)
+    assert len(board.available_place) > 0
+    board_map = {False: {-1: 0, 0: 1, 1: -1}, True: {-1: 0, 0: -1, 1: 1}}
+    converted_board = [
+        [
+            board_map[board.current_side][board.board[i][j]]
+            for j in range(len(board.board))
+        ]
+        for i in range(len(board.board))
+    ]
+    return BoardAI(converted_board).down_chess(-1)
+

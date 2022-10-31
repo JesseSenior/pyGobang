@@ -18,7 +18,6 @@ File: src/display/widget/board.py
 Description: The widget for displaying the board.
 """
 from __future__ import annotations
-from random import choice
 import threading
 from time import sleep
 import pygame
@@ -44,8 +43,7 @@ from src.constants import (
 )
 from src.core import Board
 from src.display.widget.background import Background
-from src.players import Player, RobotPlayer
-import src.ai
+from src.players import MonkeyPlayer, Player, RobotPlayer
 
 
 class UIPlayer(Player):
@@ -53,16 +51,24 @@ class UIPlayer(Player):
         super().__init__(board_ui._board)
         self._board_ui = board_ui
 
-
-class MonkeyUIPlayer(UIPlayer):
-    def __init__(self, board_ui: BoardUI) -> None:
-        super().__init__(board_ui)
-        self._thread = threading.Thread(target=self.place_a_piece)
+    def place_a_piece(self) -> None:
+        self._thread = threading.Thread(target=self._place_a_piece)
         self._thread.start()
 
-    def place_a_piece(self) -> None:
+    def _place_a_piece(self, move: Tuple[int, int] = None) -> None:
+        if move == None:
+            move = self.get_move()
+        self._board_ui.place_a_piece(move)
+        try:
+            pygame.mixer.Sound(getpath("sound/sound2.ogg")).play()
+        except:
+            pass
+
+
+class MonkeyUIPlayer(UIPlayer, MonkeyPlayer):
+    def _place_a_piece(self) -> None:
         sleep(0.5)
-        self._board_ui.place_a_piece(choice(list(self.board.available_place)))
+        super()._place_a_piece()
 
 
 class HumanUIPlayer(UIPlayer):
@@ -72,7 +78,10 @@ class HumanUIPlayer(UIPlayer):
         self._col_interval = board_ui._surface.get_size()[0] / (self._col + 1)
         self._row_interval = board_ui._surface.get_size()[1] / (self._row + 1)
 
-        board_ui._handlers[MOUSEBUTTONDOWN].append(self._mouse_button_down)
+    def place_a_piece(self) -> None:
+        self._board_ui._handlers[MOUSEBUTTONDOWN].append(
+            self._mouse_button_down
+        )
 
     def _mouse_button_down(self, event: pygame.event.Event):
         if (
@@ -92,12 +101,11 @@ class HumanUIPlayer(UIPlayer):
                 + self._row_interval / 2
                 - self._board_ui._surface.get_abs_offset()[1]
             ) // self._row_interval
-            x, y = int(x), int(y)
-            if 1 <= x <= self._col and 1 <= y <= self._row:
-                self._board_ui.place_a_piece((x - 1, y - 1))
-                pygame.mixer.Sound(getpath("sound/sound2.ogg")).play()
+            move = (int(x) - 1, int(y) - 1)
+            if move in self._board_ui._board.available_place:
+                super()._place_a_piece(move)
 
-    def stop_play(self) -> None:
+    def __del__(self) -> None:
         try:
             self._board_ui._handlers[MOUSEBUTTONDOWN].remove(
                 self._mouse_button_down
@@ -107,18 +115,7 @@ class HumanUIPlayer(UIPlayer):
 
 
 class RobotUIPlayer(UIPlayer, RobotPlayer):
-    def __init__(self, board_ui: BoardUI) -> None:
-        UIPlayer.__init__(self, board_ui)
-        RobotPlayer.__init__(self, self.board)
-        self._thread = threading.Thread(target=self.place_a_piece)
-        self._thread.start()
-
-    def place_a_piece(self) -> None:
-        assert len(self.board.available_place) > 0
-
-        move = src.ai.get_move(self.board)
-        self._board_ui.place_a_piece(move)
-        pygame.mixer.Sound(getpath("sound/sound2.ogg")).play()
+    pass
 
 
 class BoardUI(Widget):
@@ -140,8 +137,10 @@ class BoardUI(Widget):
         self._board_background.set_surface(
             self, self._surface_raw.get_rect(), self._surface_raw
         )
-        self.load_board(board)
-        self.set_player_list(player_list)
+
+        self._sub_widgets: List[Widget]
+        self._player: UIPlayer
+        self.load_board(board, player_list)
 
         self._last_sub_widgets = []
         self.editable = True
@@ -153,9 +152,17 @@ class BoardUI(Widget):
             if self._board.winner == None
             else self._board.winner
         )
+        try:
+            del self._player
+        except:
+            pass
         self._player = self._player_list[self._current_player](self)
+        if self._board.winner == None:
+            self._player.place_a_piece()
 
-    def load_board(self, board: Board):
+    def load_board(
+        self, board: Board = None, player_list: List[UIPlayer] = None
+    ):
         for widget in reversed(self._sub_widgets):
             try:
                 widget.visible = False
@@ -205,6 +212,9 @@ class BoardUI(Widget):
                     i * 0.08 + 0.5,
                 )
             )
+        if player_list == None:
+            player_list = self._player_list
+        self.set_player_list(player_list)
 
     def place_a_piece(self, pos: Tuple[int, int]):
         if not self.editable:
@@ -223,9 +233,13 @@ class BoardUI(Widget):
         self._sub_widgets.append(piece)
         self._current_player = self._board._current_side
 
-        self._player.stop_play()
+        try:
+            del self._player
+        except:
+            pass
         if self._board.winner == None:
             self._player = self._player_list[self._current_player](self)
+            self._player.place_a_piece()
 
     def cancel(self, step: int):
         if not self.editable:
@@ -244,8 +258,12 @@ class BoardUI(Widget):
             return
         self._current_player = self._board._current_side
 
-        self._player.stop_play()
+        try:
+            del self._player
+        except:
+            pass
         self._player = self._player_list[self._current_player](self)
+        self._player.place_a_piece()
 
     def draw_begin(self) -> None:
         self._board_background.draw()
