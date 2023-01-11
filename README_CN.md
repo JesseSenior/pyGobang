@@ -45,6 +45,19 @@ conda activate pyGobang_env
 
 即可进入项目开发环境，此时若执行`python pyGobang.py`即可启动游戏主体。
 
+除此之外，你也可以通过执行以下代码来配置环境：
+
+```sh
+conda create -n "pyGobang_env" `
+    python=3.10 nomkl black numpy `
+    pillow pip scipy scikit-image sqlite `
+    ordered-set pyinstaller `
+    --no-default-packages -y
+
+conda activate pyGobang_env
+pip install pygame
+```
+
 ### 2 执行打包脚本
 
 ```sh
@@ -52,4 +65,4 @@ cd script
 ./build_win.ps1
 ```
 
-等待脚本结束后，即可在项目根目录下得到游戏可执行文件（通常命名为“pyGobang_Win_(PROCESSOR_ARCHITECTURE).exe”）。
+等待脚本结束后，即可在项目根目录下得到游戏可执行文件（通常命名为“pyGobang.exe”）。

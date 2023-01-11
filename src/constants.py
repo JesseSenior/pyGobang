@@ -24,8 +24,18 @@ import pygame.freetype
 WINDOW_SIZE = (800, 600)  # (WIDTH,HEIGHT)
 MAX_FPS = 60
 DEFAULT_BOARD_SIZE = (15, 15)  # (WIDTH,LENGTH)
+MAINSCREEN_BOARD_SIZE = (13, 13)  # (WIDTH,LENGTH)
 
 TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+
+MUTE_SOUND = False
+BLINK_PERIOD = 60 / 110  # BPM of the sound
+
+EFFECT_DURATION_TINY = BLINK_PERIOD / 4  # Switch Status
+EFFECT_DURATION_MINI = BLINK_PERIOD / 2  # Screen Change
+EFFECT_DURATION_NORMAL = BLINK_PERIOD  # Common Widget
+EFFECT_DURATION_LARGE = BLINK_PERIOD * 2  # Environment Effect
+EFFECT_DURATION_HUGE = BLINK_PERIOD * 4  # Environment Effect (Long Period)
 
 COLOR_BACKGROUND = (148, 87, 59)
 COLOR_BOARD = (237, 177, 64)
@@ -35,28 +45,29 @@ COLOR_WHITE = (230, 230, 230)
 COLOR_TRANSPARENT = (0, 0, 0, 0)
 
 GAME_BACKGROUND = None
-TEXTURE_BLOCK_SIZE = 160
-SELECT_ATTEMPT = 1000
-OVERLAY_SCALE = 4
+TEXTURE_BLOCK_SIZE = 256
+SELECT_ATTEMPT = 128
+OVERLAY_SCALE = 8
 
 import os
 
-DATAPATH = os.getenv("PYGOBANG_DATAPATH")
+RESPATH = os.getenv("PYGOBANG_RESPATH")
 
 
-def getpath(path):
-    return os.path.join(DATAPATH, path)
+def res_path(path):
+    return os.path.join(RESPATH, path)
 
 
 AI_ABILITY = 7500
 
 pygame.freetype.init()
 TEXT_FONT = pygame.freetype.Font(
-    getpath("font/sarasa-mono-sc-nerd/sarasa-mono-sc-nerd-regular.ttf"),
+    res_path("font/sarasa-mono-sc-nerd/sarasa-mono-sc-nerd-regular.ttf"),
     floor(min(WINDOW_SIZE) / 100 * 5),
 )
 
 SCREEN_CHANGE = pygame.event.custom_type()
+TIMER_TICK = pygame.event.custom_type()
 LAST_BOARD = None
 
 DEFAULT_DATABASE_PATH = "data.db"

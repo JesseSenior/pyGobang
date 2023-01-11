@@ -1,0 +1,98 @@
+classDiagram
+    class Widget{
+        +Widget parent
+        +pygame.Rect rect
+        +pygame.Surface surface
+        +bool visible
+        +draw()
+        #_shift_in()
+        #_shift_out()
+        #_event_handler(event)
+        #_draw_begin()
+        #_draw_sub_widgets(sub_widgets_list)
+        #_process_flags(flag_list)
+        #_draw_end()
+    }
+
+    class Background{
+        +bool background_prepared
+        +set_surface(parent, rect, surface)
+        +generate_background(size)
+    }
+
+    class BoardUI{
+        +Board board
+        +bool editable
+        +set_player_list(player_list)
+        +load_board(board, player_list)
+        +place_a_piece(pos, mute_sound)
+        +cancel(step)
+    }
+
+    class Button{
+    }
+
+    class InputBox{
+        +bool activate
+        +str text
+    }
+
+    class LOGO{
+    }
+
+    class Table{
+        +set_text_list(text_list)
+    }
+
+    class Text{
+        +str text
+    }
+
+    Widget <|-- Background
+    Widget <|-- BoardUI
+    Widget <|-- Button
+    Widget <|-- InputBox
+    Widget <|-- LOGO
+    Widget <|-- Table
+    Widget <|-- Text
+
+    class Screen{
+        #pygame.time.Clock _clock
+        #bool _visible
+        #int _stop_loop
+        #_screen_change(event)
+        +loop()
+    }
+    
+    class screen_list{
+        <<enumeration>>
+        None
+        InitScreen
+        MainScreen
+        GameScreen
+    }
+
+    class InitScreen{
+        #LOGO _game_logo
+    }
+
+    class MainScreen{
+        #LOGO _game_logo
+        #BoardUI _board
+        #List[Widget] _sub_menu
+    }
+
+    class GameScreen{
+        #int _game_mode
+        #Board _board
+        #BoardUI _boardUI
+    }
+
+    screen_list *-- InitScreen
+    screen_list *-- MainScreen
+    screen_list *-- GameScreen
+
+    Widget <|-- Screen
+    Screen <|-- InitScreen
+    Screen <|-- MainScreen
+    Screen <|-- GameScreen

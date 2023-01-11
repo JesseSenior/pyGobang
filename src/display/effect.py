@@ -23,6 +23,7 @@ from typing import Callable, Tuple
 from PIL import Image, ImageFilter
 
 from src.display.tool import image_to_surface, surface_to_image
+from src.constants import COLOR_TRANSPARENT
 
 transformers = {
     "linear": lambda x: x,
@@ -150,10 +151,9 @@ class blur_effect(SurfaceFlag):
 
     def execute(self) -> None:
         try:
-            self._target_surface.blit(
-                surface_blur(self._surface, next(self._transformer_blur)[0]),
-                (0, 0),
-            )
+            tmp = surface_blur(self._surface, next(self._transformer_blur)[0])
+            self._target_surface.fill(COLOR_TRANSPARENT)
+            self._target_surface.blit(tmp, (0, 0))
         except StopIteration:
             self.exit()
 
@@ -175,12 +175,11 @@ class mosaic_effect(SurfaceFlag):
 
     def execute(self) -> None:
         try:
-            self._target_surface.blit(
-                surface_mosaic(
-                    self._surface, next(self._transformer_granularity)[0]
-                ),
-                (0, 0),
+            tmp = surface_mosaic(
+                self._surface, next(self._transformer_granularity)[0]
             )
+            self._target_surface.fill(COLOR_TRANSPARENT)
+            self._target_surface.blit(tmp, (0, 0))
         except StopIteration:
             self.exit()
 

@@ -21,7 +21,7 @@ from __future__ import annotations
 import pygame
 
 from src.display.widget import Widget
-from src.constants import COLOR_TRANSPARENT, TEXT_FONT
+from src.constants import COLOR_TRANSPARENT, TEXT_FONT, EFFECT_DURATION_NORMAL
 from src.display.effect import alpha_effect
 
 
@@ -55,33 +55,29 @@ class Text(Widget):
             self._text = value
             self._text_raw = TEXT_FONT.render(self._text)[0]
 
-    @Widget.visible.setter
-    def visible(self, value: bool):
-        if self._visible != value:
-            if value:
-                self.shift_in(1)
-            else:
-                self.shift_out(1)
-
-    def shift_in(self, duration: float):
+    def _shift_in(self):
         assert self._visible == False
 
         self._visible = True
 
-        self._flags.append(
-            alpha_effect(self._surface_raw, "ease_in", (0, 255), duration)
+        self._flags["before_end"].append(
+            alpha_effect(
+                self._surface_raw, "linear", (0, 255), EFFECT_DURATION_NORMAL
+            )
         )
 
-    def shift_out(self, duration: float):
+    def _shift_out(self):
         assert self._visible == True
 
         self._visible = False
 
-        self._flags.append(
-            alpha_effect(self._surface_raw, "ease_out", (255, 0), duration)
+        self._flags["before_end"].append(
+            alpha_effect(
+                self._surface_raw, "linear", (255, 0), EFFECT_DURATION_NORMAL
+            )
         )
 
-    def draw_begin(self) -> None:
+    def _draw_begin(self) -> None:
         self._surface_raw.fill(COLOR_TRANSPARENT)
         self._surface_raw.blit(
             self._text_raw,
@@ -90,5 +86,5 @@ class Text(Widget):
             ),
         )
 
-    def draw_end(self) -> None:
+    def _draw_end(self) -> None:
         self._surface.blit(self._surface_raw, (0, 0))

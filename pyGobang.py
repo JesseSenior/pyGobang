@@ -19,9 +19,8 @@ Description: Game entry point.
 """
 import os
 
-os.environ["PYGOBANG_DATAPATH"] = os.path.join(
-    os.path.dirname(__file__), "res/"
-)
+os.environ["PYGOBANG_RESPATH"] = os.path.join(os.path.dirname(__file__), "res/")
+os.environ["SDL_IME_SHOW_UI"] = "1"
 
 from src.main import main
 

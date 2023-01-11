@@ -29,9 +29,12 @@ from src.constants import (
     COLOR_BLACK,
     COLOR_TRANSPARENT,
     WINDOW_SIZE,
-    getpath,
+    EFFECT_DURATION_MINI,
+    EFFECT_DURATION_NORMAL,
+    EFFECT_DURATION_HUGE,
+    res_path,
 )
-from src.display.effect import mosaic_effect, alpha_effect, surface_blur
+from src.display.effect import blur_effect, alpha_effect, surface_blur
 from src.display.texture import generate_texture
 
 
@@ -39,7 +42,7 @@ class Background(Widget):
     def __init__(
         self,
         size: Tuple[int, int] = WINDOW_SIZE,
-        img_path=getpath("image/background.png"),
+        img_path=res_path("image/background.png"),
         default_color=COLOR_BACKGROUND,
         enable_shader=True,
     ) -> None:
@@ -63,6 +66,34 @@ class Background(Widget):
             self._shader = surface_blur(self._shader, min(WINDOW_SIZE) // 10)
             self._shader.set_alpha(50)
 
+            def breath_in():
+                self._flags["before_end"].append(
+                    alpha_effect(
+                        self._shader,
+                        "ease_in_out",
+                        (50, 150),
+                        EFFECT_DURATION_HUGE,
+                        breath_out,
+                    )
+                )
+
+            def breath_out():
+                self._flags["before_end"].append(
+                    alpha_effect(
+                        self._shader,
+                        "ease_in_out",
+                        (150, 50),
+                        EFFECT_DURATION_HUGE,
+                        breath_in,
+                    )
+                )
+
+            breath_in()
+
+    @property
+    def background_prepared(self):
+        return hasattr(self, "_background")
+
     def set_surface(
         self, parent: Widget, rect: pygame.Rect, surface: pygame.Surface = None
     ):
@@ -77,29 +108,30 @@ class Background(Widget):
             self._background_img = generate_texture(self._img_path, size)
             self._background = pygame.Surface(self._background_img.get_size())
 
-            self._flags.append(
-                mosaic_effect(
+            self._flags["before_end"].append(
+                blur_effect(
                     self._background_img,
                     "ease_in",
                     (50, 1),
-                    0.8,
+                    EFFECT_DURATION_NORMAL + EFFECT_DURATION_MINI,
                     target_surface=self._background,
                 )
             )
-            self._flags.append(
-                alpha_effect(self._background, "ease_in", (0, 255), 0.5)
-            )
-            if self._enable_shader:
-                self._flags.append(
-                    alpha_effect(self._shader, "ease_in", (50, 200), 0.8)
+            self._flags["before_end"].append(
+                alpha_effect(
+                    self._background,
+                    "ease_in",
+                    (0, 255),
+                    EFFECT_DURATION_NORMAL,
                 )
+            )
         except:
             pass
 
-    def draw_begin(self) -> None:
+    def _draw_begin(self) -> None:
         self._surface.fill(self._default_color)
 
-    def draw_end(self) -> None:
+    def _draw_end(self) -> None:
         if hasattr(self, "_background"):
             self._surface.blit(self._background, (0, 0))
         if self._enable_shader:

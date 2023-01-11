@@ -1,0 +1,73 @@
+classDiagram
+    class Flag{
+        #Widget _parent
+        #Callable _on_exit
+        +bool is_finished
+        +exit()
+        +execute()
+    }
+
+    class SurfaceFlag{
+        #pygame.Surface _surface
+        #pygame.Surface _target_surface
+    }
+
+    class delayed_flag{
+        #Callable[[], Flag] _waiting_flag
+        #List[Flag] _flag_list
+        #pygame.time.Clock _timer
+        #int _tick
+    }
+
+    class temporary_flag{
+    }
+
+    class blur_effect{
+        #Iterator _transformer_blur
+    }
+
+    class mosaic_effect{
+        #Iterator _transformer_granularity
+    }
+
+    class alpha_effect{
+        #Iterator _transformer_alpha
+    }
+
+    Flag <|-- SurfaceFlag
+    Flag <|-- delayed_flag
+    Flag <|-- temporary_flag
+    SurfaceFlag <|-- blur_effect
+    SurfaceFlag <|-- mosaic_effect
+    SurfaceFlag <|-- alpha_effect
+
+    class Player{
+        +get_move() Tuple[int, int]
+        +place_a_piece()
+    }
+
+    class UIPlayer{
+        #_board_ui
+        #_place_a_piece(move, mute_sound)
+    }
+
+    class MonkeyUIPlayer{
+        #_timer_tick(event)
+    }
+
+    class HumanUIPlayer{
+        #_mouse_button_down(event)
+    }
+
+    class RobotUIPlayer{
+    }
+
+
+    Player <|-- UIPlayer
+    UIPlayer <|-- MonkeyUIPlayer
+    UIPlayer <|-- HumanUIPlayer
+    UIPlayer <|-- RobotUIPlayer
+    MonkeyPlayer <|-- MonkeyUIPlayer
+    RobotPlayer <|-- RobotUIPlayer
+
+    

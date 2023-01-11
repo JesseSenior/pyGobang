@@ -1,0 +1,24 @@
+flowchart TD
+    subgraph backend[后端模块]
+        direction LR
+        core[核心逻辑模块]
+        database[数据库模块]
+        ai[AI模块]
+    end
+
+    subgraph gui[GUI模块]
+        direction LR
+        display[显示侧]
+        interact[事件侧]
+        flag[效果侧]
+    end
+
+    core -->|数据持久化| database
+    core -->|人机对战| ai
+
+    display -->|事件传递| interact
+    interact -->|效果驱动| flag
+    flag -->|动效/音效| display
+
+    backend -->|可视化| gui
+    gui -->|用户响应| backend

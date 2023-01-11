@@ -23,7 +23,7 @@ from time import sleep
 import pygame
 import numpy as np
 from pygame.constants import MOUSEBUTTONDOWN, BUTTON_LEFT
-from math import ceil
+from math import ceil, floor
 from typing import List, Tuple
 from src.display.effect import (
     alpha_effect,
@@ -39,7 +39,12 @@ from src.constants import (
     COLOR_RED,
     COLOR_TRANSPARENT,
     COLOR_WHITE,
-    getpath,
+    MUTE_SOUND,
+    EFFECT_DURATION_TINY,
+    EFFECT_DURATION_MINI,
+    EFFECT_DURATION_NORMAL,
+    TIMER_TICK,
+    res_path,
 )
 from src.core import Board
 from src.display.widget.background import Background
@@ -55,28 +60,33 @@ class UIPlayer(Player):
         self._thread = threading.Thread(target=self._place_a_piece)
         self._thread.start()
 
-    def _place_a_piece(self, move: Tuple[int, int] = None) -> None:
+    def _place_a_piece(
+        self, move: Tuple[int, int] = None, mute_sound: bool = MUTE_SOUND
+    ) -> None:
         if move == None:
             move = self.get_move()
-        self._board_ui.place_a_piece(move)
-        try:
-            pygame.mixer.Sound(getpath("sound/sound2.ogg")).play()
-        except:
-            pass
+        self._board_ui.place_a_piece(move, mute_sound)
 
 
 class MonkeyUIPlayer(UIPlayer, MonkeyPlayer):
-    def _place_a_piece(self) -> None:
-        sleep(0.5)
-        super()._place_a_piece()
+    def __init__(self, board_ui: BoardUI) -> None:
+        super().__init__(board_ui)
+
+    def _timer_tick(self, event: pygame.event.Event):
+        if self._timer_tick in self._board_ui._handlers[TIMER_TICK]:
+            self._board_ui._handlers[TIMER_TICK].remove(self._timer_tick)
+        self._place_a_piece(mute_sound=True)
+
+    def place_a_piece(self) -> None:
+        self._board_ui._handlers[TIMER_TICK].append(self._timer_tick)
 
 
 class HumanUIPlayer(UIPlayer):
     def __init__(self, board_ui: BoardUI) -> None:
         super().__init__(board_ui)
         self._col, self._row = self.board.board_size
-        self._col_interval = board_ui._surface.get_size()[0] / (self._col + 1)
-        self._row_interval = board_ui._surface.get_size()[1] / (self._row + 1)
+        self._col_interval = board_ui.rect.width / (self._col + 1)
+        self._row_interval = board_ui.rect.height / (self._row + 1)
 
     def place_a_piece(self) -> None:
         self._board_ui._handlers[MOUSEBUTTONDOWN].append(
@@ -85,21 +95,14 @@ class HumanUIPlayer(UIPlayer):
 
     def _mouse_button_down(self, event: pygame.event.Event):
         if (
-            pygame.Rect(
-                *self._board_ui._surface.get_abs_offset(),
-                *self._board_ui._surface.get_size()
-            ).collidepoint(event.pos)
+            self._board_ui.abs_rect.collidepoint(event.pos)
             and event.button == BUTTON_LEFT
         ):
             x = (
-                event.pos[0]
-                + self._col_interval / 2
-                - self._board_ui._surface.get_abs_offset()[0]
+                event.pos[0] + self._col_interval / 2 - self._board_ui.rect.x
             ) // self._col_interval
             y = (
-                event.pos[1]
-                + self._row_interval / 2
-                - self._board_ui._surface.get_abs_offset()[1]
+                event.pos[1] + self._row_interval / 2 - self._board_ui.rect.y
             ) // self._row_interval
             move = (int(x) - 1, int(y) - 1)
             if move in self._board_ui._board.available_place:
@@ -129,11 +132,13 @@ class BoardUI(Widget):
     ) -> None:
         super().__init__(parent, rect, surface)
         self._board_background = Background(
-            rect.size, getpath("image/background2.png"), COLOR_BOARD, False
+            rect.size, res_path("image/background2.png"), COLOR_BOARD, False
         )
         self._surface_raw = pygame.Surface(self._surface.get_size())
         self._surface_raw.set_alpha(0)
         self._visible = False
+        self.editable = True
+
         self._board_background.set_surface(
             self, self._surface_raw.get_rect(), self._surface_raw
         )
@@ -143,19 +148,27 @@ class BoardUI(Widget):
         self.load_board(board, player_list)
 
         self._last_sub_widgets = []
-        self.editable = True
+
+    @property
+    def board(self):
+        return self._board
 
     def set_player_list(self, player_list: List[UIPlayer]):
+        _editable = self.editable
+        self.editable = False
+
         self._player_list = player_list
-        self._current_player = (
-            self._board.current_side
-            if self._board.winner == None
-            else self._board.winner
-        )
+        if self._board.winner != None:
+            self._current_player = self._board.winner
+        else:
+            self._current_player = self._board.current_side
+
         try:
             del self._player
         except:
             pass
+
+        self.editable = _editable
         self._player = self._player_list[self._current_player](self)
         if self._board.winner == None:
             self._player.place_a_piece()
@@ -163,6 +176,8 @@ class BoardUI(Widget):
     def load_board(
         self, board: Board = None, player_list: List[UIPlayer] = None
     ):
+        _editable = self.editable
+        self.editable = False
         for widget in reversed(self._sub_widgets):
             try:
                 widget.visible = False
@@ -176,8 +191,8 @@ class BoardUI(Widget):
         self._board = board
 
         self._col, self._row = board.board_size
-        self._col_interval = self._surface.get_size()[0] / (self._col + 1)
-        self._row_interval = self._surface.get_size()[1] / (self._row + 1)
+        self._col_interval = self._surface.get_width() / (self._col + 1)
+        self._row_interval = self._surface.get_height() / (self._row + 1)
 
         self._grid = BoardUI.Grid(
             self, self._surface_raw.get_rect(), self._surface_raw, board
@@ -205,18 +220,20 @@ class BoardUI(Widget):
                 except:
                     pass
 
-            self._pre_flags.append(
+            self._flags["after_begin"].append(
                 delayed_flag(
-                    self._pre_flags,
+                    self._flags["after_begin"],
                     lambda: temporary_flag(self, lambda: onexit()),
-                    i * 0.08 + 0.5,
+                    i * EFFECT_DURATION_MINI + EFFECT_DURATION_TINY,
                 )
             )
         if player_list == None:
             player_list = self._player_list
+
+        self.editable = _editable
         self.set_player_list(player_list)
 
-    def place_a_piece(self, pos: Tuple[int, int]):
+    def place_a_piece(self, pos: Tuple[int, int], mute_sound: bool = False):
         if not self.editable:
             return
 
@@ -230,14 +247,16 @@ class BoardUI(Widget):
             )
         except:
             return
+        if not mute_sound:
+            pygame.mixer.Sound(res_path("sound/sound2.ogg")).play()
         self._sub_widgets.append(piece)
-        self._current_player = self._board._current_side
 
         try:
             del self._player
         except:
             pass
         if self._board.winner == None:
+            self._current_player = self._board._current_side
             self._player = self._player_list[self._current_player](self)
             self._player.place_a_piece()
 
@@ -265,41 +284,42 @@ class BoardUI(Widget):
         self._player = self._player_list[self._current_player](self)
         self._player.place_a_piece()
 
-    def draw_begin(self) -> None:
+    def _draw_begin(self) -> None:
         self._board_background.draw()
         self._surface_raw.blit(surface_blur(self._surface_raw, 3), (0, 0))
-        self.draw_sub_widgets(self._last_sub_widgets)
+        self._draw_sub_widgets(self._last_sub_widgets)
 
-    def draw_end(self) -> None:
+    def _draw_end(self) -> None:
         self._surface.blit(self._surface_raw, (0, 0))
 
-    @Widget.visible.setter
-    def visible(self, value: bool):
-        if self._visible != value:
-            if value:
-                self.shift_in(1)
-            else:
-                self.shift_out(1)
-
-    def shift_in(self, duration: float):
+    def _shift_in(self):
         assert self._visible == False
 
-        def onexit():
-            self._visible = True
+        self._visible = True
 
-        self._flags.append(
+        self._flags["before_end"].append(
             alpha_effect(
-                self._surface_raw, "ease_in", (0, 255), duration, onexit
+                self._surface_raw,
+                "linear",
+                (0, 255),
+                EFFECT_DURATION_NORMAL,
             )
         )
 
-    def shift_out(self, duration: float):
+    def _shift_out(self):
         assert self._visible == True
 
-        self._visible = False
+        def on_exit():
+            self._visible = False
 
-        self._flags.append(
-            alpha_effect(self._surface_raw, "ease_out", (255, 0), duration)
+        self._flags["before_end"].append(
+            alpha_effect(
+                self._surface_raw,
+                "linear",
+                (255, 0),
+                EFFECT_DURATION_NORMAL,
+                on_exit,
+            )
         )
 
     class Grid(Widget):
@@ -312,11 +332,11 @@ class BoardUI(Widget):
         ) -> None:
             super().__init__(parent, rect, surface)
             self._col, self._row = board.board_size
-            self._col_interval = self._surface.get_size()[0] / (self._col + 1)
-            self._row_interval = self._surface.get_size()[1] / (self._row + 1)
-            self._line_width = ceil(min(self._surface.get_size()) / 200)
+            self._col_interval = self._rect.width / (self._col + 1)
+            self._row_interval = self._rect.height / (self._row + 1)
+            self._line_width = ceil(min(self._rect.size) / 200) // 2 * 2 + 1
 
-        def draw_begin(self) -> None:
+        def _draw_begin(self) -> None:
             for col in np.linspace(
                 self._col_interval, self._col_interval * self._col, self._col
             ):
@@ -353,16 +373,14 @@ class BoardUI(Widget):
             self._pos_raw = pos
             pos = (pos[0] + 1, pos[1] + 1)
             self._col, self._row = board.board_size
-            self._col_interval = self._surface.get_size()[0] / (self._col + 1)
-            self._row_interval = self._surface.get_size()[1] / (self._row + 1)
+            self._col_interval = self._rect.width / (self._col + 1)
+            self._row_interval = self._rect.height / (self._row + 1)
             self._pos = (
                 pos[0] * self._col_interval,
                 pos[1] * self._row_interval,
             )
-            self._radius = min(self._surface.get_size()) / (self._col + 1) * 0.4
-            self._surface_raw = pygame.Surface(
-                self._surface.get_size()
-            ).convert_alpha()
+            self._radius = min(self._rect.size) / (self._col + 1) * 0.4
+            self._surface_raw = pygame.Surface(self._rect.size).convert_alpha()
             self._surface_raw.fill(COLOR_TRANSPARENT)
             self._type = board.current_side if type == None else type
             if type == None:
@@ -371,7 +389,7 @@ class BoardUI(Widget):
             self._visible = False
             self.visible = True
 
-        def draw_begin(self) -> None:
+        def _draw_begin(self) -> None:
             pygame.draw.circle(
                 self._surface_raw,
                 COLOR_WHITE if self._type else COLOR_BLACK,
@@ -398,32 +416,33 @@ class BoardUI(Widget):
                     ceil(self._radius / 20),
                 )
 
-        def draw_end(self) -> None:
+        def _draw_end(self) -> None:
             self._surface.blit(self._surface_raw, (0, 0))
 
-        @Widget.visible.setter
-        def visible(self, value: bool):
-            if self._visible != value:
-                if value:
-                    self.shift_in(0.25)
-                else:
-                    self.shift_out(0.25)
-
-        def shift_in(self, duration: float):
+        def _shift_in(self):
             assert self._visible == False
 
             self._visible = True
 
-            self._flags.append(
-                alpha_effect(self._surface_raw, "ease_in", (0, 255), duration)
+            self._flags["before_end"].append(
+                alpha_effect(
+                    self._surface_raw,
+                    "linear",
+                    (0, 255),
+                    EFFECT_DURATION_MINI,
+                )
             )
 
-        def shift_out(self, duration: float):
+        def _shift_out(self):
             assert self._visible == True
 
             self._visible = False
 
-            self._flags.append(
-                alpha_effect(self._surface_raw, "ease_out", (255, 0), duration)
+            self._flags["before_end"].append(
+                alpha_effect(
+                    self._surface_raw,
+                    "linear",
+                    (255, 0),
+                    EFFECT_DURATION_MINI,
+                )
             )
-

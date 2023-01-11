@@ -20,10 +20,7 @@ Description:
     board. 
 """
 from typing import Tuple
-import numpy as np
 from random import choice
-from copy import deepcopy
-from operator import itemgetter
 
 import src.constants
 import src.ai
@@ -31,12 +28,11 @@ from src.core import Board
 
 
 class Player:
-    """The general definition to the player.
-    """
+    """General definition to the player."""
 
     def __init__(self, playing_board: Board) -> None:
         """Initialize the player with current playing board.
-        
+
         Args:
             playing_board (Board): Current playing board.
         """
@@ -44,10 +40,10 @@ class Player:
 
     def get_move(self) -> Tuple[int, int]:
         """Attempt to get player's move.
-        
+
         Notice:
             This function should NOT place any pieces!
-        
+
         Returns:
             Tuple[int, int]: Move of player.
         """
@@ -58,24 +54,21 @@ class Player:
 
 
 class MonkeyPlayer(Player):
-    """🐵: A cute monkey player, you will like it :)
-    """
+    """🐵: A cute monkey player, you will like it :)"""
 
     def get_move(self) -> Tuple[int, int]:
         return choice(list(self.board.available_place))
 
 
 class RobotPlayer(Player):
-    """🤖: A cute robot player. Smarter than monkey :)
-    """
+    """🤖: A cute robot player. Smarter than monkey :)"""
 
     def get_move(self) -> Tuple[int, int]:
         return src.ai.get_move(self.board)
 
 
 class HumanPlayer(Player):
-    """😉: A cute human player. Smarter than robot, probably :)
-    """
+    """😉: A cute human player. Smarter than robot, probably :)"""
 
     def get_move(self) -> Tuple[int, int]:
         move = tuple(map(int, input("Choose your column, row:").split()))

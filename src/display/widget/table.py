@@ -33,7 +33,10 @@ from src.constants import (
     COLOR_TRANSPARENT,
     COLOR_WHITE,
     TEXT_FONT,
-    getpath,
+    MUTE_SOUND,
+    EFFECT_DURATION_TINY,
+    EFFECT_DURATION_NORMAL,
+    res_path,
 )
 from src.display.effect import alpha_effect, blur_effect, surface_blur
 
@@ -63,10 +66,7 @@ class Table(Widget):
         def _mouse_button_down(event: pygame.event.Event):
             if self._visible and len(self._sub_widgets) > 0:
                 if (
-                    pygame.Rect(
-                        *self._surface.get_abs_offset(),
-                        *self._surface.get_size()
-                    ).collidepoint(event.pos)
+                    self._abs_rect.collidepoint(event.pos)
                     and event.button == BUTTON_LEFT
                 ):
                     y = (
@@ -76,16 +76,18 @@ class Table(Widget):
                         self._active_item != y + self._display_offset
                         and len(self._sub_widgets) > y + self._display_offset
                     ):
-                        pygame.mixer.Sound(getpath("sound/sound1.ogg")).play()
-                        self._sub_widgets[self._active_item].active = False
+                        if not MUTE_SOUND:
+                            pygame.mixer.Sound(
+                                res_path("sound/sound1.ogg")
+                            ).play()
+                        self._sub_widgets[self._active_item].activate = False
                         self._active_item = y + self._display_offset
-                        self._sub_widgets[self._active_item].active = True
+                        self._sub_widgets[self._active_item].activate = True
+                        self._active_item_change()
 
         def _mouse_scroll(event: pygame.event.Event):
             if self._visible and len(self._sub_widgets) > 0:
-                if pygame.Rect(
-                    *self._surface.get_abs_offset(), *self._surface.get_size()
-                ).collidepoint(event.pos):
+                if self._abs_rect.collidepoint(event.pos):
                     if event.button == BUTTON_WHEELDOWN:
                         if self._display_offset + self._present_number < len(
                             self._sub_widgets
@@ -98,6 +100,9 @@ class Table(Widget):
         self._handlers[MOUSEBUTTONDOWN].append(_mouse_button_down)
         self._handlers[MOUSEBUTTONDOWN].append(_mouse_scroll)
 
+    def _active_item_change(self):
+        pass
+
     def set_text_list(self, text_list: List[List[str]] = []) -> None:
         self._sub_widgets = []
 
@@ -109,48 +114,53 @@ class Table(Widget):
                 self._sub_widgets.append(Table.Item(self, tmp, text))
             self._active_item = 0
             self._display_offset = 0
-            self._sub_widgets[0].active = True
+            self._sub_widgets[0].activate = True
         else:
             self._active_item = None
             self._display_offset = 0
 
-    @Widget.visible.setter
-    def visible(self, value: bool):
-        if self._visible != value:
-            if value:
-                self.shift_in(1)
-            else:
-                self.shift_out(1)
-
-    def shift_in(self, duration: float):
+    def _shift_in(self):
         assert self._visible == False
 
         def onexit():
             self._visible = True
             self._surface.blit(surface_blur(self._surface, self._blur), (0, 0))
 
-        self._pre_flags.append(
+        self._flags["after_begin"].append(
             blur_effect(
-                self._surface, "ease_in", (0, self._blur), duration, onexit
+                self._surface,
+                "ease_in",
+                (0, self._blur),
+                EFFECT_DURATION_NORMAL,
+                onexit,
             )
         )
-        self._flags.append(
-            alpha_effect(self._surface_raw, "ease_in", (0, 255), duration)
+        self._flags["before_end"].append(
+            alpha_effect(
+                self._surface_raw, "ease_in", (0, 255), EFFECT_DURATION_NORMAL
+            )
         )
 
-    def shift_out(self, duration: float):
+    def _shift_out(self):
         assert self._visible == True
 
         self._visible = False
 
-        self._pre_flags.append(
-            blur_effect(self._surface, "ease_out", (self._blur, 0), duration)
+        self._flags["after_begin"].append(
+            blur_effect(
+                self._surface,
+                "ease_out",
+                (self._blur, 0),
+                EFFECT_DURATION_NORMAL,
+            )
         )
-        self._flags.append(
-            alpha_effect(self._surface_raw, "ease_out", (255, 0), duration)
+        self._flags["before_end"].append(
+            alpha_effect(
+                self._surface_raw, "ease_out", (255, 0), EFFECT_DURATION_NORMAL
+            )
         )
 
-    def draw_begin(self) -> None:
+    def _draw_begin(self) -> None:
         self._surface_raw.fill(COLOR_TRANSPARENT)
         pygame.draw.rect(
             self._surface_raw, (0, 0, 0, 100), self._surface_raw.get_rect(), 3
@@ -158,7 +168,7 @@ class Table(Widget):
         if self._visible:
             self._surface.blit(surface_blur(self._surface, self._blur), (0, 0))
 
-    def draw_end(self) -> None:
+    def _draw_end(self) -> None:
         try:
             for i in range(
                 self._display_offset,
@@ -208,53 +218,57 @@ class Table(Widget):
             ).convert_alpha()
             self._active_background.fill(COLOR_WHITE)
             self._active_background.set_alpha(50)
-            self._active = False
+            self._activate = False
 
         @property
-        def active(self):
-            return self._active
+        def activate(self):
+            return self._activate
 
-        @active.setter
-        def active(self, value: bool):
-            if self._active != value:
+        @activate.setter
+        def activate(self, value: bool):
+            if self._activate != value:
                 if value:
-                    self.active_in(0.2)
+                    self._activate_in()
                 else:
-                    self.active_out(0.2)
+                    self._activate_out()
 
-        def active_in(self, duration: float):
-            assert self._active == False
+        def _activate_in(self):
+            assert self._activate == False
+            self._activate = True
 
-            def onexit():
-                self._active = True
-
-            self._flags.append(
+            self._flags["before_end"].clear()
+            current_alpha = self._active_background.get_alpha()
+            self._flags["before_end"].append(
                 alpha_effect(
                     self._active_background,
-                    "ease_in",
-                    (50, 150),
-                    duration,
-                    onexit,
+                    "linear",
+                    (current_alpha, 150),
+                    EFFECT_DURATION_TINY * (150 - current_alpha) / 150,
                 )
             )
 
-        def active_out(self, duration: float):
-            assert self._active == True
+        def _activate_out(self):
+            assert self._activate == True
 
-            self._active = False
+            self._activate = False
 
-            self._flags.append(
+            self._flags["before_end"].clear()
+            current_alpha = self._active_background.get_alpha()
+            self._flags["before_end"].append(
                 alpha_effect(
-                    self._active_background, "ease_out", (150, 50), duration
+                    self._active_background,
+                    "linear",
+                    (current_alpha, 50),
+                    EFFECT_DURATION_TINY * (current_alpha - 50) / 150,
                 )
             )
 
-        def draw_begin(self) -> None:
+        def _draw_begin(self) -> None:
             self._surface.fill(COLOR_TRANSPARENT)
 
-        def draw_end(self) -> None:
+        def _draw_end(self) -> None:
             self._surface.blit(self._active_background, (0, 0))
-            if self._active:
+            if self._activate:
                 pygame.draw.rect(
                     self._surface,
                     (*COLOR_RED, 150),
@@ -263,8 +277,10 @@ class Table(Widget):
                 )
             else:
                 pygame.draw.rect(
-                    self._surface, (0, 0, 0, 80), self._surface.get_rect(), 1,
+                    self._surface,
+                    (0, 0, 0, 80),
+                    self._surface.get_rect(),
+                    1,
                 )
             for text, pos in self._text:
                 self._surface.blit(text, pos)
-

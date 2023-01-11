@@ -21,32 +21,29 @@ import pygame
 from PIL import Image
 
 
-def image_to_surface(pilImage: Image.Image) -> pygame.Surface:
+def image_to_surface(image: Image.Image) -> pygame.Surface:
     """Convert PIL Image to pygame Surface.
 
     Args:
-        pilImage (Image.Image): PIL Image.
+        image (Image.Image): PIL Image.
 
     Returns:
         pygame.Surface: pygame Surface.
     """
-    return pygame.image.fromstring(
-        pilImage.tobytes(), pilImage.size, pilImage.mode
-    ).convert_alpha()
+    return pygame.image.fromstring(image.tobytes(), image.size, image.mode)
 
 
-def surface_to_image(pygameSurface: pygame.Surface) -> Image.Image:
+def surface_to_image(surface: pygame.Surface) -> Image.Image:
     """Convert pygame Surface to PIL Image.
 
     Args:
-        pygameSurface (pygame.Surface): pygame Surface.
+        surface (pygame.Surface): pygame Surface.
 
     Returns:
         Image.Image: PIL Image.
     """
     return Image.frombytes(
         "RGBA",
-        pygameSurface.get_size(),
-        pygame.image.tostring(pygameSurface, "RGBA", False),
+        surface.get_size(),
+        pygame.image.tostring(surface, "RGBA", False),
     )
-

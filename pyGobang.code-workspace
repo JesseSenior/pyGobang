@@ -1,11 +1,11 @@
 {
 	"folders": [
 		{
+			"name": "pyGobang",
 			"path": "."
 		}
 	],
 	"settings": {
-		"editor.suggest.snippetsPreventQuickSuggestions": false,
 		"editor.acceptSuggestionOnEnter": "off",
 		"python.formatting.provider": "black",
 		"python.formatting.blackArgs": [
@@ -13,7 +13,8 @@
 		],
 		"autoDocstring.docstringFormat": "google",
 		"[python]": {
-			"editor.formatOnType": true,
+			"editor.defaultFormatter": null,
+			"editor.formatOnType": false,
 			"editor.formatOnSave": true,
 			"editor.rulers": [
 				80,

@@ -20,6 +20,7 @@ Description: The primary game screen of the game.
 from math import ceil
 import time
 import pygame
+from pygame.locals import QUIT
 
 import src.constants
 from src.constants import (
@@ -31,6 +32,11 @@ from src.constants import (
     SCREEN_CHANGE,
     TIME_FORMAT,
     WINDOW_SIZE,
+    EFFECT_DURATION_TINY,
+    EFFECT_DURATION_MINI,
+    EFFECT_DURATION_NORMAL,
+    MUTE_SOUND,
+    res_path,
 )
 from src.core import Board
 from src.display.effect import (
@@ -90,9 +96,11 @@ class GameScreen(Screen):
                 del self._return_button
                 self._init_player()
 
-            self._flags.append(
+            self._flags["before_end"].append(
                 delayed_flag(
-                    self._flags, lambda: temporary_flag(self, onexit), 1
+                    self._flags["before_end"],
+                    lambda: temporary_flag(self, onexit),
+                    EFFECT_DURATION_NORMAL,
                 )
             )
 
@@ -208,9 +216,11 @@ class GameScreen(Screen):
                 )
                 self._init_gameboard()
 
-            self._flags.append(
+            self._flags["before_end"].append(
                 delayed_flag(
-                    self._flags, lambda: temporary_flag(self, onexit), 1
+                    self._flags["before_end"],
+                    lambda: temporary_flag(self, onexit),
+                    EFFECT_DURATION_NORMAL / 2,
                 )
             )
 
@@ -303,8 +313,24 @@ class GameScreen(Screen):
         def cancel():
             if self._game_mode == 0:
                 self._boardUI.cancel(1)
-            elif type(self._boardUI._player) == HumanUIPlayer:
+            elif (
+                self._boardUI._player_list[self._boardUI._current_player]
+                == HumanUIPlayer
+            ):
+                if self._boardUI._board.winner == None:
+                    self._boardUI.cancel(2)
+                else:
+                    self._boardUI.cancel(1)
+            elif self._boardUI._board.winner != None:
                 self._boardUI.cancel(2)
+            elif len(self._boardUI._board.available_place) == 0:
+                if (
+                    self._boardUI._player_list[self._boardUI._current_player]
+                    == HumanUIPlayer
+                ):
+                    self._boardUI.cancel(2)
+                else:
+                    self._boardUI.cancel(1)
 
         self._cancel_button = Button(
             self,
@@ -368,7 +394,7 @@ class GameScreen(Screen):
         self._current_player_text.visible = True
         self._sub_widgets.append(self._current_player_text)
 
-    def draw_begin(self) -> None:
+    def _draw_begin(self) -> None:
         if self._visible:
             src.constants.GAME_BACKGROUND.draw()
         if hasattr(self, "_current_player_text"):
@@ -384,33 +410,32 @@ class GameScreen(Screen):
                     self._board.competitor_white,
                 ][self._board.winner]
 
-    def draw_end(self) -> None:
+    def _draw_end(self) -> None:
         if not self.visible:
             self._surface.blit(
                 surface_mosaic(self._surface, min(WINDOW_SIZE) // 10), (0, 0)
             )
 
-    @Widget.visible.setter
-    def visible(self, value: bool):
-        if self._visible != value:
-            if value:
-                self.shift_in()
-            else:
-                self.shift_out()
-
-    def shift_in(self):
+    def _shift_in(self):
         assert self._visible == False
 
         self._visible = True
 
-        self._flags.append(
+        self._flags["before_end"].append(
             mosaic_effect(
-                self._surface, "ease_in", (min(WINDOW_SIZE) // 10, 1), 1
+                self._surface,
+                "ease_in",
+                (min(WINDOW_SIZE) // 10, 1),
+                EFFECT_DURATION_MINI,
             )
         )
 
-    def shift_out(self, event: pygame.event.Event):
+    def _shift_out(self, event: pygame.event.Event = None):
         assert self._visible == True
+
+        if event.type == QUIT:
+            self._stop_loop = 0
+            return
 
         for widget in self._sub_widgets:
             try:
@@ -418,22 +443,22 @@ class GameScreen(Screen):
             except:
                 pass
 
+        if not MUTE_SOUND:
+            pygame.mixer.Sound(res_path("sound/sound3.ogg")).play()
+
         def onexit(event):
             self._visible = False
-            self.stop_loop = event.screen
+            self._stop_loop = event.screen
 
-        self._flags.append(
+        self._flags["before_end"].append(
             mosaic_effect(
                 self._surface,
                 "ease_out",
                 (1, min(WINDOW_SIZE) // 10),
-                1,
+                EFFECT_DURATION_NORMAL,
                 on_exit=lambda: onexit(event),
             )
         )
-
-    def _screen_chage(self, event: pygame.event.Event):
-        self.shift_out(event)
 
 
 class PieceStatus(Widget):
@@ -490,26 +515,26 @@ class PieceStatus(Widget):
         self._surface_raw_final.set_alpha(0)
         self._visible = False
 
-    def draw_begin(self) -> None:
+    def _draw_begin(self) -> None:
         status = (
             self._board.current_side
             if self._board.winner == None
             else self._board.winner
         )
         if self._status != status:
-            self._flags.append(
+            self._flags["before_end"].append(
                 alpha_effect(
                     self._surface_raw[1 - status], "ease_in_out", (255, 0), 0.2
                 )
             )
-            self._flags.append(
+            self._flags["before_end"].append(
                 alpha_effect(
                     self._surface_raw[status], "ease_in_out", (0, 255), 0.2
                 )
             )
             self._status = status
 
-    def draw_end(self) -> None:
+    def _draw_end(self) -> None:
         self._surface_raw_final.fill(COLOR_TRANSPARENT)
         self._surface_raw_final.blit(self._surface_raw[0], (0, 0))
         self._surface_raw_final.blit(self._surface_raw[1], (0, 0))
@@ -523,29 +548,30 @@ class PieceStatus(Widget):
             )
         self._surface.blit(self._surface_raw_final, (0, 0))
 
-    @Widget.visible.setter
-    def visible(self, value: bool):
-        if self._visible != value:
-            if value:
-                self.shift_in()
-            else:
-                self.shift_out()
-
-    def shift_in(self):
+    def _shift_in(self):
         assert self._visible == False
 
         self._visible = True
 
-        self._flags.append(
-            alpha_effect(self._surface_raw_final, "ease_in", (0, 255), 1)
+        self._flags["before_end"].append(
+            alpha_effect(
+                self._surface_raw_final,
+                "linear",
+                (0, 255),
+                EFFECT_DURATION_TINY,
+            )
         )
 
-    def shift_out(self):
+    def _shift_out(self):
         assert self._visible == True
 
         self._visible = False
 
-        self._flags.append(
-            alpha_effect(self._surface_raw_final, "ease_out", (255, 0), 1)
+        self._flags["before_end"].append(
+            alpha_effect(
+                self._surface_raw_final,
+                "linear",
+                (255, 0),
+                EFFECT_DURATION_TINY,
+            )
         )
-

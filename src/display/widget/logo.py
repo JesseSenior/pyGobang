@@ -21,7 +21,11 @@ from __future__ import annotations
 import pygame
 from random import choice
 from typing import Tuple
-from src.constants import getpath
+from src.constants import (
+    res_path,
+    EFFECT_DURATION_NORMAL,
+    EFFECT_DURATION_LARGE,
+)
 
 from src.display.widget import Widget
 from src.display.effect import alpha_effect
@@ -29,13 +33,13 @@ from src.display.effect import alpha_effect
 
 class LOGO(Widget):
     def __init__(
-        self, parent: Widget, pos: Tuple[int, int], scale: float
+        self, parent: Widget, pos: Tuple[int, int], scale: float, blink: bool=True
     ) -> None:
         self._logo_img = pygame.image.load(
             choice(
                 [
-                    getpath("image/LOGO_dark.png"),
-                    getpath("image/LOGO_light.png"),
+                    res_path("image/LOGO_dark.png"),
+                    res_path("image/LOGO_light.png"),
                 ]
             )
         ).convert_alpha()
@@ -49,34 +53,64 @@ class LOGO(Widget):
         self._logo_img = pygame.transform.smoothscale(self._logo_img, rect.size)
         self._logo_img.set_alpha(0)
         self._visible = False
+        self._blink=blink
 
-    @Widget.visible.setter
-    def visible(self, value: bool):
-        if self._visible != value:
-            if value:
-                self.shift_in(1)
-            else:
-                self.shift_out(1)
-
-    def shift_in(self, duration: float):
+    def _shift_in(self):
         assert self._visible == False
 
         def onexit():
             self._visible = True
+            if self._blink:
+                breath_out()
 
-        self._flags.append(
-            alpha_effect(self._logo_img, "ease_in", (0, 255), duration, onexit)
+        self._flags["before_end"].append(
+            alpha_effect(
+                self._logo_img,
+                "linear",
+                (0, 255),
+                EFFECT_DURATION_NORMAL,
+                onexit,
+            )
         )
 
-    def shift_out(self, duration: float):
+        def breath_in():
+            self._flags["after_begin"].append(
+                alpha_effect(
+                    self._logo_img,
+                    "ease_in_out",
+                    (175, 255),
+                    EFFECT_DURATION_LARGE,
+                    breath_out,
+                )
+            )
+
+        def breath_out():
+            self._flags["after_begin"].append(
+                alpha_effect(
+                    self._logo_img,
+                    "ease_in_out",
+                    (255, 175),
+                    EFFECT_DURATION_LARGE,
+                    breath_in,
+                )
+            )
+
+    def _shift_out(self):
         assert self._visible == True
 
         def onexit():
             self._visible = False
 
-        self._flags.append(
-            alpha_effect(self._logo_img, "ease_out", (255, 0), duration, onexit)
+        self._flags["after_begin"].clear()
+        self._flags["before_end"].append(
+            alpha_effect(
+                self._logo_img,
+                "linear",
+                (self._logo_img.get_alpha(), 0),
+                EFFECT_DURATION_NORMAL,
+                onexit,
+            )
         )
 
-    def draw_end(self) -> None:
+    def _draw_end(self) -> None:
         self._surface.blit(self._logo_img, (0, 0))

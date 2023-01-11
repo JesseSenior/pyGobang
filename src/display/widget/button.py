@@ -23,8 +23,20 @@ from pygame.constants import MOUSEBUTTONDOWN, BUTTON_LEFT, MOUSEMOTION
 from typing import Callable
 
 from src.display.widget import Widget
-from src.constants import COLOR_TRANSPARENT, TEXT_FONT, getpath
-from src.display.effect import alpha_effect, blur_effect, surface_blur
+from src.constants import (
+    COLOR_TRANSPARENT,
+    TEXT_FONT,
+    MUTE_SOUND,
+    EFFECT_DURATION_MINI,
+    EFFECT_DURATION_NORMAL,
+    res_path,
+)
+from src.display.effect import (
+    delayed_flag,
+    alpha_effect,
+    blur_effect,
+    surface_blur,
+)
 
 
 class Button(Widget):
@@ -34,7 +46,9 @@ class Button(Widget):
         rect: pygame.Rect,
         surface: pygame.Surface = None,
         text: str = "",
-        on_press: Callable[[],] = lambda: None,
+        on_press: Callable[
+            [],
+        ] = lambda: None,
     ) -> None:
         super().__init__(parent, rect, surface)
         self._blur = 50
@@ -46,13 +60,11 @@ class Button(Widget):
         def _mouse_button_down(event: pygame.event.Event):
             if self._visible:
                 if (
-                    pygame.Rect(
-                        *self._surface.get_abs_offset(),
-                        *self._surface.get_size()
-                    ).collidepoint(event.pos)
+                    self._abs_rect.collidepoint(event.pos)
                     and event.button == BUTTON_LEFT
                 ):
-                    pygame.mixer.Sound(getpath("sound/sound2.ogg")).play()
+                    if not MUTE_SOUND:
+                        pygame.mixer.Sound(res_path("sound/sound2.ogg")).play()
                     on_press()
 
         self._handlers[MOUSEBUTTONDOWN].append(_mouse_button_down)
@@ -61,50 +73,54 @@ class Button(Widget):
 
         def _mouse_motion(event: pygame.event.Event):
             if self._visible:
-                if pygame.Rect(
-                    *self._surface.get_abs_offset(), *self._surface.get_size()
-                ).collidepoint(event.pos):
+                if self._abs_rect.collidepoint(event.pos):
                     if not self._on_mouse:
-                        pygame.mixer.Sound(getpath("sound/sound1.ogg")).play()
+                        if not MUTE_SOUND:
+                            pygame.mixer.Sound(
+                                res_path("sound/sound1.ogg")
+                            ).play()
                         self._on_mouse = True
                 else:
                     self._on_mouse = False
 
         # self._handlers[MOUSEMOTION].append(_mouse_motion)
 
-    @Widget.visible.setter
-    def visible(self, value: bool):
-        if self._visible != value:
-            if value:
-                self.shift_in(1)
-                self._text.visible = True
-            else:
-                self.shift_out(1)
-                self._text.visible = False
-
-    def shift_in(self, duration: float):
+    def _shift_in(self):
         assert self._visible == False
+
+        self._text.visible = True
 
         def onexit():
             self._visible = True
             self._surface.blit(surface_blur(self._surface, self._blur), (0, 0))
 
-        self._pre_flags.append(
-            blur_effect(
-                self._surface, "ease_in", (0, self._blur), duration, onexit
+        self._flags["after_begin"].append(
+            delayed_flag(
+                self._flags["after_begin"],
+                lambda: blur_effect(
+                    self._surface,
+                    "linear",
+                    (0, self._blur),
+                    EFFECT_DURATION_MINI,
+                    onexit,
+                ),
+                EFFECT_DURATION_NORMAL - EFFECT_DURATION_MINI,
             )
         )
 
-    def shift_out(self, duration: float):
+    def _shift_out(self):
         assert self._visible == True
 
+        self._text.visible = False
         self._visible = False
 
-        self._pre_flags.append(
-            blur_effect(self._surface, "ease_out", (self._blur, 0), duration)
+        self._flags["after_begin"].append(
+            blur_effect(
+                self._surface, "linear", (self._blur, 0), EFFECT_DURATION_MINI
+            )
         )
 
-    def draw_begin(self) -> None:
+    def _draw_begin(self) -> None:
         if self._visible == True:
             self._surface.blit(surface_blur(self._surface, self._blur), (0, 0))
 
@@ -127,33 +143,37 @@ class Button(Widget):
             self._text.set_alpha(0)
             self._visible = False
 
-        @Widget.visible.setter
-        def visible(self, value: bool):
-            if self._visible != value:
-                if value:
-                    self.shift_in(1)
-                else:
-                    self.shift_out(1)
-
-        def shift_in(self, duration: float):
+        def _shift_in(self):
             assert self._visible == False
 
             def onexit():
                 self._visible = True
 
-            self._flags.append(
-                alpha_effect(self._text, "ease_in", (0, 255), duration, onexit)
+            self._flags["before_end"].append(
+                alpha_effect(
+                    self._text,
+                    "ease_in",
+                    (0, 255),
+                    EFFECT_DURATION_NORMAL,
+                    onexit,
+                )
             )
 
-        def shift_out(self, duration: float):
+        def _shift_out(self):
             assert self._visible == True
 
             def onexit():
                 self._visible = False
 
-            self._flags.append(
-                alpha_effect(self._text, "ease_out", (255, 0), duration, onexit)
+            self._flags["before_end"].append(
+                alpha_effect(
+                    self._text,
+                    "ease_out",
+                    (255, 0),
+                    EFFECT_DURATION_NORMAL,
+                    onexit,
+                )
             )
 
-        def draw_end(self) -> None:
+        def _draw_end(self) -> None:
             self._surface.blit(self._text, (0, 0))

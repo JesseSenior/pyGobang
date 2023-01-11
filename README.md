@@ -45,6 +45,19 @@ conda activate pyGobang_env
 
 Then you can enter the project development environment, if you execute `python pyGobang.py` to start the game body.
 
+In addition, you can also configure the environment by executing the following code:
+
+```sh
+conda create -n "pyGobang_env" `
+    python=3.10 nomkl black numpy `
+    pillow pip scipy scikit-image sqlite `
+    ordered-set pyinstaller `
+    --no-default-packages -y
+
+conda activate pyGobang_env
+pip install pygame
+```
+
 ### 2 Execute packing script (beta)
 
 ```sh
@@ -52,4 +65,4 @@ cd script
 ./build.ps1
 ```
 
-Wait for the script to finish and you will get game's binary named "pyGobang_Win_(PROCESSOR_ARCHITECTURE).exe" in the root directory of the project.
+Wait for the script to finish and you will get game's binary named "pyGobang.exe" in the root directory of the project.
