@@ -18,6 +18,8 @@ File: src/display/tool.py
 Description: Other practical tools for the display.
 """
 import pygame
+import src.constants
+
 from PIL import Image
 
 
@@ -47,3 +49,9 @@ def surface_to_image(surface: pygame.Surface) -> Image.Image:
         surface.get_size(),
         pygame.image.tostring(surface, "RGBA", False),
     )
+    
+def play_sound(sound_path):
+    if not src.constants.MUTE_SOUND:
+        sound=pygame.mixer.Sound(src.constants.res_path(sound_path))
+        sound.set_volume(src.constants.SOUND_VOLUME)
+        sound.play()

@@ -33,6 +33,7 @@ from src.display.effect import (
 )
 
 from src.display.widget import Widget
+from src.display.tool import play_sound
 from src.constants import (
     COLOR_BLACK,
     COLOR_BOARD,
@@ -65,7 +66,7 @@ class UIPlayer(Player):
     ) -> None:
         if move == None:
             move = self.get_move()
-        self._board_ui.place_a_piece(move, mute_sound)
+        self._board_ui.place_a_piece(move, mute_sound, self)
 
 
 class MonkeyUIPlayer(UIPlayer, MonkeyPlayer):
@@ -73,8 +74,9 @@ class MonkeyUIPlayer(UIPlayer, MonkeyPlayer):
         super().__init__(board_ui)
 
     def _timer_tick(self, event: pygame.event.Event):
-        if self._timer_tick in self._board_ui._handlers[TIMER_TICK]:
-            self._board_ui._handlers[TIMER_TICK].remove(self._timer_tick)
+        for handler in self._board_ui._handlers[TIMER_TICK]:
+            if handler.__qualname__ == self._timer_tick.__qualname__:
+                self._board_ui._handlers[TIMER_TICK].remove(handler)
         self._place_a_piece(mute_sound=True)
 
     def place_a_piece(self) -> None:
@@ -233,9 +235,17 @@ class BoardUI(Widget):
         self.editable = _editable
         self.set_player_list(player_list)
 
-    def place_a_piece(self, pos: Tuple[int, int], mute_sound: bool = False):
+    def place_a_piece(
+        self,
+        pos: Tuple[int, int],
+        mute_sound: bool = False,
+        current_player: UIPlayer = None,
+    ):
         if not self.editable:
             return
+        if current_player != None:
+            if current_player != self._player:
+                return
 
         try:
             piece = BoardUI.Piece(
@@ -247,8 +257,9 @@ class BoardUI(Widget):
             )
         except:
             return
+
         if not mute_sound:
-            pygame.mixer.Sound(res_path("sound/sound2.ogg")).play()
+            play_sound("sound/sound2.ogg")
         self._sub_widgets.append(piece)
 
         try:

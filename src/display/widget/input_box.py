@@ -31,15 +31,14 @@ from pygame.constants import (
 from pygame.freetype import STYLE_UNDERLINE
 
 from src.display.widget import Widget
+from src.display.tool import play_sound
 from src.constants import (
     COLOR_TRANSPARENT,
     COLOR_WHITE,
-    MUTE_SOUND,
     EFFECT_DURATION_TINY,
     EFFECT_DURATION_MINI,
     EFFECT_DURATION_NORMAL,
     TEXT_FONT,
-    res_path,
 )
 from src.display.effect import (
     delayed_flag,
@@ -194,9 +193,20 @@ class InputBox(Widget):
 
         self._activate = True
 
-        if not MUTE_SOUND:
-            pygame.mixer.Sound(res_path("sound/sound1.ogg")).play()
+        play_sound("sound/sound1.ogg")
 
+        def on_exit():
+            pygame.key.start_text_input()
+            pygame.key.set_text_input_rect(self._abs_rect)
+
+            for event, handler in {
+                (KEYDOWN, self._key_down),
+                (TEXTINPUT, self._text_input),
+                (TEXTEDITING, self._text_editing),
+            }:
+                if handler not in self._handlers[event]:
+                    self._handlers[event].append(handler)
+    
         self._flags["before_end"].clear()
         self._flags["before_end"].append(
             alpha_effect(
@@ -206,19 +216,9 @@ class InputBox(Widget):
                 EFFECT_DURATION_TINY
                 * (150 - self._background.get_alpha())
                 / (150 - 50),
+                on_exit
             )
         )
-
-        pygame.key.start_text_input()
-        pygame.key.set_text_input_rect(self._abs_rect)
-
-        for event, handler in {
-            (KEYDOWN, self._key_down),
-            (TEXTINPUT, self._text_input),
-            (TEXTEDITING, self._text_editing),
-        }:
-            if handler not in self._handlers[event]:
-                self._handlers[event].append(handler)
 
     def _activate_out(self):
         assert self._visible == True

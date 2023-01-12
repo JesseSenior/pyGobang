@@ -30,10 +30,9 @@ from src.constants import (
     MAINSCREEN_BOARD_SIZE,
     EFFECT_DURATION_MINI,
     EFFECT_DURATION_NORMAL,
-    MUTE_SOUND,
-    res_path,
 )
 from src.core import Board
+from src.display.tool import play_sound
 from src.display.effect import (
     mosaic_effect,
     surface_mosaic,
@@ -132,8 +131,7 @@ class MainScreen(Screen):
             except:
                 pass
 
-        if not MUTE_SOUND:
-            pygame.mixer.Sound(res_path("sound/sound3.ogg")).play()
+        play_sound("sound/sound3.ogg")
 
         def onexit(event):
             self._visible = False
@@ -560,12 +558,12 @@ class SettingMenu(Widget):
                     rect.width,
                     rect.height / 11,
                 ),
-                text="AI智商:",
+                text="游戏BGM大小:",
             )
         )
 
         self._sub_widgets.append(
-            SettingMenu.setting_ai_ability_inputbox(
+            SettingMenu.setting_music_volume_inputbox(
                 self,
                 pygame.Rect(
                     0,
@@ -573,23 +571,51 @@ class SettingMenu(Widget):
                     rect.width,
                     rect.height / 11,
                 ),
-                text_hint=str(src.constants.AI_ABILITY),
+                text_hint=str("{:.0%}".format(pygame.mixer.music.get_volume())),
             )
         )
+
+        self._sub_widgets.append(
+            Text(
+                self,
+                pygame.Rect(
+                    0,
+                    rect.height / 11 * 7,
+                    rect.width,
+                    rect.height / 11,
+                ),
+                text="游戏音效大小:",
+            )
+        )
+
+        self._sub_widgets.append(
+            SettingMenu.setting_sound_volume_inputbox(
+                self,
+                pygame.Rect(
+                    0,
+                    rect.height / 11 * 8,
+                    rect.width,
+                    rect.height / 11,
+                ),
+                text_hint=str("{:.0%}".format(src.constants.SOUND_VOLUME)),
+            )
+        )
+
+    @property
+    def board(self):
+        self.parent._board: BoardUI
+        return self.parent._board
 
     class setting_board_size_inputbox(InputBox):
         def _activate_out(self):
             try:
-                tmp = eval(self.text)
-                if (
-                    type(tmp) == tuple
-                    and len(tmp) == 2
-                    and type(tmp[0]) == int
-                    and type(tmp[1]) == int
-                ):
-                    src.constants.DEFAULT_BOARD_SIZE = tmp
-                    self._parent._board.load_board()
-                    self.text_hint = str(tmp)
+                import re
+
+                tmp = re.findall("[0-9]+", self.text)
+                src.constants.DEFAULT_BOARD_SIZE = int(tmp[0]), int(tmp[1])
+                self._parent.board: BoardUI
+                self._parent.board.load_board()
+                self.text_hint = str(src.constants.DEFAULT_BOARD_SIZE)
             except:
                 pass
             self.text = ""
@@ -607,13 +633,30 @@ class SettingMenu(Widget):
             self.text = ""
             super()._activate_out()
 
-    class setting_ai_ability_inputbox(InputBox):
+    class setting_music_volume_inputbox(InputBox):
         def _activate_out(self):
             try:
-                tmp = eval(self.text)
-                if type(tmp) == int and tmp > 0:
-                    src.constants.AI_ABILITY = tmp
-                    self.text_hint = str(tmp)
+                import re
+                pygame.mixer.music.set_volume(float(re.findall(r"\d+(?:\.\d+)?", self.text)[0]) / 100)
+
+                self.text_hint = str(
+                    str("{:.0%}".format(pygame.mixer.music.get_volume()))
+                )
+            except:
+                pass
+            self.text = ""
+            super()._activate_out()
+
+    class setting_sound_volume_inputbox(InputBox):
+        def _activate_out(self):
+            try:
+                import re
+                src.constants.SOUND_VOLUME = float(re.findall(r"\d+(?:\.\d+)?", self.text)[0]) / 100
+                if src.constants.SOUND_VOLUME>1.0:
+                    src.constants.SOUND_VOLUME=1.0
+                self.text_hint = str(
+                    str("{:.0%}".format(src.constants.SOUND_VOLUME))
+                )
             except:
                 pass
             self.text = ""

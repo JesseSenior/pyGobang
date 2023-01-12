@@ -23,13 +23,12 @@ from pygame.constants import MOUSEBUTTONDOWN, BUTTON_LEFT, MOUSEMOTION
 from typing import Callable
 
 from src.display.widget import Widget
+from src.display.tool import play_sound
 from src.constants import (
     COLOR_TRANSPARENT,
     TEXT_FONT,
-    MUTE_SOUND,
     EFFECT_DURATION_MINI,
     EFFECT_DURATION_NORMAL,
-    res_path,
 )
 from src.display.effect import (
     delayed_flag,
@@ -63,8 +62,7 @@ class Button(Widget):
                     self._abs_rect.collidepoint(event.pos)
                     and event.button == BUTTON_LEFT
                 ):
-                    if not MUTE_SOUND:
-                        pygame.mixer.Sound(res_path("sound/sound2.ogg")).play()
+                    play_sound("sound/sound2.ogg")
                     on_press()
 
         self._handlers[MOUSEBUTTONDOWN].append(_mouse_button_down)
@@ -75,10 +73,7 @@ class Button(Widget):
             if self._visible:
                 if self._abs_rect.collidepoint(event.pos):
                     if not self._on_mouse:
-                        if not MUTE_SOUND:
-                            pygame.mixer.Sound(
-                                res_path("sound/sound1.ogg")
-                            ).play()
+                        play_sound("sound/sound1.ogg")
                         self._on_mouse = True
                 else:
                     self._on_mouse = False

@@ -8,11 +8,11 @@
 
 ## 状态
 
-游戏当前已发布版本v0.1.1，目前以基本完成功能性目标，但仍然**可能存在巨量BUG**。 :(
+游戏当前已发布版本v0.2.1，目前已基本完成功能性目标。
 
-如果发现BUG，欢迎写issue踢我~😉
+如果发现BUG，欢迎拿issue砸我~😉
 
-游戏使用pygame作为图形引擎，利用sqlite记录历史棋局。
+游戏使用pygame作为图形引擎，利用SQLite记录历史棋局。
 
 游戏人机对战部分修改自@Xshellye的开源项目[GoBang-python-homework](https://github.com/Xshellye/GoBang-python-homework)。
 

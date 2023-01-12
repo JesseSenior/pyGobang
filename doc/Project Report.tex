@@ -290,7 +290,7 @@ GUI部分合理发挥面向对象设计的思想，对pygame的各个模块进�
     \end{center}
 \end{multicols}
 
-截止本文档完成时，本项目为v0.2.0版本。项目源代码以及预编译二进制文件可以从\href{https://github.com/JesseSenior/pyGobang}{JesseSenior/pyGobang}获得，同时可以从\href{https://www.bilibili.com/video/BV1iL4y1N79m}{Bilibili}观看本项目v0.1.1版本的演示视频。
+截止本文档完成时，本项目为v0.2.1版本。项目源代码以及预编译二进制文件可以从\href{https://github.com/JesseSenior/pyGobang}{JesseSenior/pyGobang}获得，同时可以从\href{https://www.bilibili.com/video/BV1iL4y1N79m}{Bilibili}观看本项目v0.1.1版本的演示视频。
 
 \section{项目目标完成情况}
 
@@ -309,9 +309,37 @@ GUI部分合理发挥面向对象设计的思想，对pygame的各个模块进�
 
 \subsection{源代码总行数统计结果}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=.4\columnwidth]{Line Count}
-\end{figure}
+\begin{minted}{shell}
+     LINES | FILE
+-----------|--------------------
+        28 | ./pyGobang.py
+       239 | ./src/ai.py
+       103 | ./src/constants.py  
+       223 | ./src/core.py
+       117 | ./src/database.py
+        51 | ./src/main.py
+        79 | ./src/players.py
+         0 | ./src/__init__.py
+       205 | ./display/effect.py
+       175 | ./display/texture.py
+        57 | ./display/tool.py
+         0 | ./display/__init__.py
+       575 | ./screen/game_screen.py
+       135 | ./screen/init_screen.py
+       665 | ./screen/main_screen.py
+        99 | ./screen/__init__.py
+       138 | ./widget/background.py
+       459 | ./widget/board.py
+       174 | ./widget/button.py
+       349 | ./widget/input_box.py
+       116 | ./widget/logo.py
+       282 | ./widget/table.py
+        90 | ./widget/text.py
+       191 | ./widget/__init__.py
+       115 | ./test/core_test.py
+        67 | ./test/database_test.py
+         0 | ./test/__init__.py
+Total Lines: 4732
+\end{minted}
 
 \end{document}

@@ -23,6 +23,7 @@ import pygame
 from pygame.locals import QUIT
 
 import src.constants
+from src.display.tool import play_sound
 from src.constants import (
     COLOR_BLACK,
     COLOR_RED,
@@ -35,8 +36,6 @@ from src.constants import (
     EFFECT_DURATION_TINY,
     EFFECT_DURATION_MINI,
     EFFECT_DURATION_NORMAL,
-    MUTE_SOUND,
-    res_path,
 )
 from src.core import Board
 from src.display.effect import (
@@ -443,8 +442,7 @@ class GameScreen(Screen):
             except:
                 pass
 
-        if not MUTE_SOUND:
-            pygame.mixer.Sound(res_path("sound/sound3.ogg")).play()
+        play_sound("sound/sound3.ogg")
 
         def onexit(event):
             self._visible = False

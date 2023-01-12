@@ -57,6 +57,8 @@ class MonkeyPlayer(Player):
     """🐵: A cute monkey player, you will like it :)"""
 
     def get_move(self) -> Tuple[int, int]:
+        if len(self.board.available_place) == 0:
+            return (0, 0)
         return choice(list(self.board.available_place))
 
 

@@ -22,9 +22,9 @@ Description:
 """
 import pygame
 
+import src.constants
 from src.constants import (
     WINDOW_SIZE,
-    MUTE_SOUND,
     TIMER_TICK,
     BLINK_PERIOD,
     res_path,
@@ -38,8 +38,9 @@ def main():
     pygame.display.set_caption("pyGobang")
     icon = pygame.image.load(res_path("image/icon.png")).convert_alpha()
     pygame.display.set_icon(icon)
-    if not MUTE_SOUND:
+    if not src.constants.MUTE_SOUND:
         pygame.mixer.music.load(res_path("sound/background_music.ogg"))
+        pygame.mixer.music.set_volume(1)
         pygame.mixer.music.play(-1, fade_ms=3000)
     pygame.time.set_timer(TIMER_TICK, int(BLINK_PERIOD * 1000))
 

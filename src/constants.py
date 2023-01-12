@@ -29,6 +29,8 @@ MAINSCREEN_BOARD_SIZE = (13, 13)  # (WIDTH,LENGTH)
 TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 MUTE_SOUND = False
+SOUND_VOLUME = 1.0
+
 BLINK_PERIOD = 60 / 110  # BPM of the sound
 
 EFFECT_DURATION_TINY = BLINK_PERIOD / 4  # Switch Status
@@ -57,8 +59,6 @@ RESPATH = os.getenv("PYGOBANG_RESPATH")
 def res_path(path):
     return os.path.join(RESPATH, path)
 
-
-AI_ABILITY = 7500
 
 pygame.freetype.init()
 TEXT_FONT = pygame.freetype.Font(

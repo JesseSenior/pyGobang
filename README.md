@@ -8,11 +8,11 @@ A python based gobang game.
 
 ## Status
 
-The game has currently been released version v0.1.0, currently to basically complete the functional goals, but still **may exist huge amount of bugs**. :(
+The game has currently been released version v0.2.1, currently to basically complete the functional goals.
 
 If you find a bug, feel free to write issues and let me know ~ 😉
 
-The game uses pygame as the graphics engine and uses sqlite to record historical games.
+The game uses pygame as the graphics engine and uses SQLite to record historical games.
 
 The human-computer part of the game is modified from @Xshellye 's open source project [GoBang-python-homework](https://github.com/Xshellye/GoBang-python-homework).
 

@@ -21,14 +21,13 @@ import pygame
 from pygame.locals import QUIT
 
 import src.constants
+from src.display.tool import play_sound
 from src.display.screen import Screen
 from src.constants import (
     SCREEN_CHANGE,
     WINDOW_SIZE,
     EFFECT_DURATION_MINI,
     EFFECT_DURATION_NORMAL,
-    MUTE_SOUND,
-    res_path,
 )
 from src.display.effect import (
     temporary_flag,
@@ -112,8 +111,7 @@ class InitScreen(Screen):
             self._stop_loop = event.screen
 
         def delayed_shift():
-            if not MUTE_SOUND:
-                pygame.mixer.Sound(res_path("sound/sound3.ogg")).play()
+            play_sound("sound/sound3.ogg")
             return mosaic_effect(
                 self._surface,
                 "ease_out",
